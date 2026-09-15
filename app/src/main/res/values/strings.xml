@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">桌面寵物</string>
+    <string name="widget_name">桌面寵物</string>
+    <string name="widget_description">在主畫面循環播放角色動畫。</string>
+    <string name="widget_content_description">桌面寵物動畫</string>
+</resources>
