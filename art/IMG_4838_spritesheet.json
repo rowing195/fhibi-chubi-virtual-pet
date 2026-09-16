@@ -1,0 +1,11 @@
+{
+  "image": "IMG_4838_spritesheet.png",
+  "frameWidth": 229,
+  "frameHeight": 242,
+  "frameCount": 29,
+  "columns": 6,
+  "rows": 5,
+  "frameDurationMs": 90,
+  "order": "left-to-right, top-to-bottom",
+  "transparent": true
+}
