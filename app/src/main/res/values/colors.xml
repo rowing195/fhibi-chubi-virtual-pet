@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="icon_transparent">#00000000</color>
+    <color name="widget_background">#F2FFFFFF</color>
+    <color name="widget_text">#FF2B2B33</color>
+    <color name="widget_text_done">#FF8E8E99</color>
+    <color name="widget_accent">#FF2F6FD6</color>
 </resources>

@@ -1,7 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">桌面寵物</string>
-    <string name="widget_name">桌面寵物</string>
-    <string name="widget_description">在主畫面循環播放角色動畫。</string>
-    <string name="widget_content_description">桌面寵物動畫</string>
+    <string name="widget_name">待辦清單</string>
+    <string name="widget_description">直接查看、勾選待辦事項，大小可自由調整。</string>
+    <string name="widget_title">待辦</string>
+    <string name="widget_add">新增待辦</string>
+    <string name="widget_clear_done">清除已完成</string>
+    <string name="widget_empty">還沒有待辦，點寵物或 ＋ 記一筆</string>
+    <string name="note_title">隨手記</string>
+    <string name="note_hint">想記下什麼？</string>
+    <string name="note_cancel">取消</string>
+    <string name="note_save">記下</string>
+    <string name="note_saved">已記下</string>
+    <string name="overlay_needed">請先允許「顯示在其他應用程式上層」，寵物才能浮在畫面上。</string>
+    <string name="overlay_granted">已取得權限，可以叫出寵物了。</string>
+    <string name="grant_overlay">前往授權</string>
+    <string name="pet_show">叫出寵物</string>
+    <string name="pet_hide">收起寵物</string>
+    <string name="pet_channel_name">浮動寵物</string>
+    <string name="pet_notification_title">寵物正在畫面上陪你</string>
 </resources>
