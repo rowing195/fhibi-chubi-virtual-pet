@@ -7,13 +7,23 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.view.View
 
+/**
+ * Idle row frames 0, 1, 3, 4 are open-eyed breathing poses; 2 and 5 are blinks. Played straight through,
+ * the row blinks about three times a second, so breathe with open eyes and blink once every few seconds.
+ */
+private val IDLE_FRAMES = run {
+    val breathe = listOf(0, 1, 3, 4)
+    (breathe + breathe + breathe + listOf(0, 1, 2, 3, 4) + breathe + breathe + breathe + listOf(0, 1, 3, 4, 5))
+        .toIntArray()
+}
+
 /** Rows of `pet_spritesheet.png`; frame counts come from the atlas's pet_request.json. */
-enum class PetAnimation(val row: Int, val frameCount: Int) {
-    IDLE(0, 6),
-    RUN_RIGHT(1, 8),
-    RUN_LEFT(2, 8),
-    WAVE(3, 4),
-    JUMP(4, 5),
+enum class PetAnimation(val row: Int, val frames: IntArray, val frameMs: Long = 120L) {
+    IDLE(0, IDLE_FRAMES, frameMs = 200L),
+    RUN_RIGHT(1, IntArray(8) { it }),
+    RUN_LEFT(2, IntArray(8) { it }),
+    WAVE(3, IntArray(4) { it }),
+    JUMP(4, IntArray(5) { it }),
 }
 
 class PetSpriteView(context: Context) : View(context) {
@@ -38,7 +48,7 @@ class PetSpriteView(context: Context) : View(context) {
     }
 
     private fun advance() {
-        if (frame < animation.frameCount - 1) {
+        if (frame < animation.frames.size - 1) {
             frame++
         } else {
             val finished = onFinished
@@ -50,12 +60,12 @@ class PetSpriteView(context: Context) : View(context) {
             frame = 0
         }
         invalidate()
-        postDelayed(tick, FRAME_MS)
+        postDelayed(tick, animation.frameMs)
     }
 
     private fun restartTicking() {
         removeCallbacks(tick)
-        postDelayed(tick, FRAME_MS)
+        postDelayed(tick, animation.frameMs)
     }
 
     override fun performClick(): Boolean = super.performClick()
@@ -71,7 +81,7 @@ class PetSpriteView(context: Context) : View(context) {
     }
 
     override fun onDraw(canvas: Canvas) {
-        val left = frame * CELL_WIDTH
+        val left = animation.frames[frame] * CELL_WIDTH
         val top = animation.row * CELL_HEIGHT
         src.set(left, top, left + CELL_WIDTH, top + CELL_HEIGHT)
         dst.set(0, 0, width, height)
@@ -81,6 +91,5 @@ class PetSpriteView(context: Context) : View(context) {
     companion object {
         const val CELL_WIDTH = 192
         const val CELL_HEIGHT = 208
-        private const val FRAME_MS = 120L
     }
 }
