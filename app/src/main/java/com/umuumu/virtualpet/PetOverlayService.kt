@@ -7,7 +7,10 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.graphics.PixelFormat
 import android.graphics.drawable.Icon
@@ -28,6 +31,31 @@ class PetOverlayService : Service() {
     private lateinit var petView: PetSpriteView
     private lateinit var params: WindowManager.LayoutParams
     private var snapAnimator: ValueAnimator? = null
+    private var noteOpen = false
+
+    private val noteStateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.getStringExtra(EXTRA_NOTE_STATE)?.let(NoteState::valueOf)) {
+                NoteState.OPENED -> {
+                    noteOpen = true
+                    rest()
+                }
+                NoteState.SAVED -> {
+                    noteOpen = false
+                    petView.play(PetAnimation.REVIEW) { rest() }
+                }
+                NoteState.CANCELLED -> {
+                    noteOpen = false
+                    petView.play(PetAnimation.FAILED) { rest() }
+                }
+                NoteState.CLOSED -> {
+                    noteOpen = false
+                    rest()
+                }
+                null -> Unit
+            }
+        }
+    }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -51,11 +79,18 @@ class PetOverlayService : Service() {
 
         petView = PetSpriteView(this)
         petView.setOnClickListener {
-            petView.play(PetAnimation.WAVE) { petView.play(PetAnimation.IDLE) }
             startActivity(Intent(this, QuickNoteActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         }
         petView.setOnTouchListener(DragListener())
         windowManager.addView(petView, params)
+        petView.play(PetAnimation.WAVE) { rest() }
+
+        val filter = IntentFilter(ACTION_NOTE_STATE)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(noteStateReceiver, filter, RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(noteStateReceiver, filter)
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -64,6 +99,7 @@ class PetOverlayService : Service() {
     }
 
     override fun onDestroy() {
+        unregisterReceiver(noteStateReceiver)
         snapAnimator?.cancel()
         windowManager.removeView(petView)
         super.onDestroy()
@@ -111,6 +147,11 @@ class PetOverlayService : Service() {
         }
     }
 
+    /** Writes along while a note is open, otherwise idles. */
+    private fun rest() {
+        petView.play(if (noteOpen) PetAnimation.WRITING else PetAnimation.IDLE)
+    }
+
     private fun moveTo(x: Int, y: Int) {
         val metrics = resources.displayMetrics
         params.x = x.coerceIn(0, metrics.widthPixels - params.width)
@@ -121,7 +162,7 @@ class PetOverlayService : Service() {
     private fun snapToEdge() {
         val screenWidth = resources.displayMetrics.widthPixels
         val targetX = if (params.x + params.width / 2 < screenWidth / 2) 0 else screenWidth - params.width
-        petView.play(PetAnimation.JUMP) { petView.play(PetAnimation.IDLE) }
+        petView.play(PetAnimation.JUMP) { rest() }
         snapAnimator = ValueAnimator.ofInt(params.x, targetX).apply {
             duration = SNAP_MS
             interpolator = DecelerateInterpolator()
@@ -176,12 +217,26 @@ class PetOverlayService : Service() {
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
+    /** CLOSED means the dialog was merely hidden (e.g. Home pressed); CANCELLED means it was dismissed unsaved. */
+    enum class NoteState { OPENED, SAVED, CANCELLED, CLOSED }
+
     companion object {
         const val ACTION_STOP = "com.umuumu.virtualpet.action.STOP_PET"
+        private const val ACTION_NOTE_STATE = "com.umuumu.virtualpet.action.NOTE_STATE"
+        private const val EXTRA_NOTE_STATE = "note_state"
         private const val CHANNEL_ID = "pet_overlay"
         private const val NOTIFICATION_ID = 1
         private const val PET_HEIGHT_DP = 80
         private const val DIRECTION_SLOP_DP = 4
         private const val SNAP_MS = 250L
+
+        /** Lets the pet react to the quick-note dialog; ignored when the pet isn't showing. */
+        fun sendNoteState(context: Context, state: NoteState) {
+            context.sendBroadcast(
+                Intent(ACTION_NOTE_STATE)
+                    .setPackage(context.packageName)
+                    .putExtra(EXTRA_NOTE_STATE, state.name),
+            )
+        }
     }
 }
