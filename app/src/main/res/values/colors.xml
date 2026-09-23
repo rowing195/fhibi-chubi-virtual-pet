@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="icon_transparent">#00000000</color>
     <color name="widget_background">#FFFFFDF8</color>
     <color name="widget_text">#FF342F29</color>
     <color name="widget_text_done">#FF6D6558</color>
