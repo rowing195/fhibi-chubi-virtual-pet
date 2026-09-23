@@ -1,5 +1,6 @@
 package com.umuumu.virtualpet
 
+import androidx.core.content.ContextCompat
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Notification
@@ -22,6 +23,8 @@ import android.view.View
 import android.view.ViewConfiguration
 import android.view.WindowManager
 import android.view.animation.DecelerateInterpolator
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlin.math.abs
 import kotlin.math.hypot
 
@@ -84,13 +87,10 @@ class PetOverlayService : Service() {
         petView.setOnTouchListener(DragListener())
         windowManager.addView(petView, params)
         petView.play(PetAnimation.WAVE) { rest() }
+        runningState.value = true
 
         val filter = IntentFilter(ACTION_NOTE_STATE)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(noteStateReceiver, filter, RECEIVER_NOT_EXPORTED)
-        } else {
-            registerReceiver(noteStateReceiver, filter)
-        }
+        ContextCompat.registerReceiver(this, noteStateReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -99,6 +99,7 @@ class PetOverlayService : Service() {
     }
 
     override fun onDestroy() {
+        runningState.value = false
         unregisterReceiver(noteStateReceiver)
         snapAnimator?.cancel()
         windowManager.removeView(petView)
@@ -221,6 +222,8 @@ class PetOverlayService : Service() {
     enum class NoteState { OPENED, SAVED, CANCELLED, CLOSED }
 
     companion object {
+        private val runningState = MutableStateFlow(false)
+        val running = runningState.asStateFlow()
         const val ACTION_STOP = "com.umuumu.virtualpet.action.STOP_PET"
         private const val ACTION_NOTE_STATE = "com.umuumu.virtualpet.action.NOTE_STATE"
         private const val EXTRA_NOTE_STATE = "note_state"

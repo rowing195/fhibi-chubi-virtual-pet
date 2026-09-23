@@ -16,9 +16,14 @@ class VirtualPetAppWidgetProvider : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray,
     ) {
-        appWidgetIds.forEach { appWidgetId ->
-            appWidgetManager.updateAppWidget(appWidgetId, buildViews(context))
-        }
+        val pending = goAsync()
+        Thread {
+            try {
+                appWidgetIds.forEach { appWidgetId ->
+                    appWidgetManager.updateAppWidget(appWidgetId, buildViews(context))
+                }
+            } finally { pending.finish() }
+        }.start()
     }
 
     @Suppress("DEPRECATION") // RemoteCollectionItems needs API 31; minSdk is 28.
@@ -30,10 +35,10 @@ class VirtualPetAppWidgetProvider : AppWidgetProvider() {
             PendingIntent.FLAG_UPDATE_CURRENT or
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0,
         )
-        val clearDone = PendingIntent.getBroadcast(
+        val clearDone = PendingIntent.getActivity(
             context,
             1,
-            Intent(context, TodoActionReceiver::class.java).setAction(TodoActionReceiver.ACTION_CLEAR_DONE),
+            Intent(context, QuickNoteActivity::class.java).putExtra(QuickNoteActivity.EXTRA_CLEAR_DONE, true),
             PendingIntent.FLAG_IMMUTABLE,
         )
         val addNote = PendingIntent.getActivity(
@@ -44,6 +49,9 @@ class VirtualPetAppWidgetProvider : AppWidgetProvider() {
         )
 
         return RemoteViews(context.packageName, R.layout.widget_todo).apply {
+            val todos = TodoRepository.get(context).all()
+            setTextViewText(R.id.widget_count, context.getString(R.string.cream_widget_pending, todos.count { !it.done }))
+            setBoolean(R.id.todo_clear_done, "setEnabled", todos.any { it.done })
             setRemoteAdapter(R.id.todo_list, Intent(context, TodoWidgetService::class.java))
             setEmptyView(R.id.todo_list, R.id.todo_empty)
             setPendingIntentTemplate(R.id.todo_list, toggleTemplate)
@@ -57,6 +65,8 @@ class VirtualPetAppWidgetProvider : AppWidgetProvider() {
         fun refreshAll(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
             val ids = manager.getAppWidgetIds(ComponentName(context, VirtualPetAppWidgetProvider::class.java))
+            val provider = VirtualPetAppWidgetProvider()
+            ids.forEach { manager.updateAppWidget(it, provider.buildViews(context)) }
             manager.notifyAppWidgetViewDataChanged(ids, R.id.todo_list)
         }
     }

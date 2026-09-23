@@ -1,34 +1,65 @@
 package com.umuumu.virtualpet
 
-import android.app.Activity
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
-import android.widget.Button
-import android.widget.EditText
+import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.umuumu.virtualpet.screens.notes.QuickNoteScreen
+import com.umuumu.virtualpet.screens.notes.QuickNoteViewModel
+import com.umuumu.virtualpet.ui.PetTheme
 
-/** Dialog opened by tapping the pet or the widget's add button. */
-class QuickNoteActivity : Activity() {
-    private lateinit var input: EditText
+class QuickNoteActivity : ComponentActivity() {
+    private val model by viewModels<QuickNoteViewModel>()
     private var saved = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_quick_note)
+        val clearing = intent.getBooleanExtra(EXTRA_CLEAR_DONE, false)
+        window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-
-        input = findViewById(R.id.note_input)
-        input.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                save()
-                true
-            } else {
-                false
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or if (clearing) WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN else WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        setFinishOnTouchOutside(false)
+        setContent {
+            val text by model.text.collectAsStateWithLifecycle()
+            val state by model.state.collectAsStateWithLifecycle()
+            LaunchedEffect(state.saved) {
+                if (state.saved) {
+                    saved = true
+                    if (!clearing) Toast.makeText(this@QuickNoteActivity, R.string.note_saved, Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            }
+            PetTheme {
+                if (clearing) {
+                    AlertDialog(
+                        onDismissRequest = { if (!state.busy) finish() },
+                        title = { Text(stringResource(R.string.cream_clear_title)) },
+                        text = { Text(stringResource(if (state.failed) R.string.cream_load_failed else R.string.cream_clear_hint)) },
+                        confirmButton = { TextButton(onClick = { model.save(clearDone = true) }, enabled = !state.busy) { Text(stringResource(R.string.cream_clear)) } },
+                        dismissButton = { TextButton(onClick = { finish() }, enabled = !state.busy) { Text(stringResource(R.string.cream_cancel)) } },
+                    )
+                } else Box(Modifier.fillMaxWidth().padding(16.dp)) {
+                    QuickNoteScreen(text, state, model::edit, { model.save() }, { finish() })
+                }
             }
         }
-        findViewById<Button>(R.id.note_save).setOnClickListener { save() }
-        findViewById<Button>(R.id.note_cancel).setOnClickListener { finish() }
     }
 
     override fun onStart() {
@@ -46,14 +77,5 @@ class QuickNoteActivity : Activity() {
         super.onStop()
     }
 
-    private fun save() {
-        val text = input.text.toString().trim()
-        // Enter can fire the editor action on both key down and key up; save only once.
-        if (text.isEmpty() || isFinishing) return
-        TodoRepository.get(this).add(text)
-        saved = true
-        VirtualPetAppWidgetProvider.refreshAll(this)
-        Toast.makeText(this, R.string.note_saved, Toast.LENGTH_SHORT).show()
-        finish()
-    }
+    companion object { const val EXTRA_CLEAR_DONE = "clear_done" }
 }

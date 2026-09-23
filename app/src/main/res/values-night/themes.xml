@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.VirtualPet" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:colorAccent">@color/widget_accent</item>
+        <item name="android:windowBackground">@color/pet_page</item>
+    </style>
+    <color name="widget_background">#FF30322A</color>
+    <color name="widget_text">#FFF5F0DF</color>
+    <color name="widget_text_done">#FFC0BAA8</color>
+    <color name="widget_accent">#FFC0D09D</color>
+    <color name="widget_subtle">#FF343329</color>
+    <color name="pet_page">#FF252720</color>
+</resources>

@@ -1,53 +1,74 @@
 package com.umuumu.virtualpet
 
 import android.Manifest
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.view.View
-import android.widget.Button
-import android.widget.TextView
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.umuumu.virtualpet.screens.PetApp
+import com.umuumu.virtualpet.screens.notes.NotesViewModel
+import com.umuumu.virtualpet.ui.PetTheme
 
-class MainActivity : Activity() {
-    private lateinit var status: TextView
-    private lateinit var grantButton: Button
-    private lateinit var showButton: Button
+class MainActivity : ComponentActivity() {
+    private val notes by viewModels<NotesViewModel>()
+    private var permitted by mutableStateOf(false)
+    private var destination by mutableStateOf("home")
+    private var navigationRequest by mutableStateOf(0)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        status = findViewById(R.id.status)
-        grantButton = findViewById(R.id.grant_overlay)
-        showButton = findViewById(R.id.show_pet)
-
-        grantButton.setOnClickListener {
-            startActivity(
-                Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")),
-            )
+        enableEdgeToEdge()
+        destination = intent.getStringExtra(EXTRA_SCREEN) ?: "home"
+        navigationRequest = savedInstanceState?.getInt("navigationRequest") ?: 0
+        val version = packageManager.getPackageInfo(packageName, 0).versionName.orEmpty()
+        setContent {
+            val state by notes.state.collectAsStateWithLifecycle()
+            val running by PetOverlayService.running.collectAsStateWithLifecycle()
+            PetTheme {
+                PetApp(
+                    destination = destination, navigationRequest = navigationRequest,
+                    notes = state, running = running, permitted = permitted, version = version,
+                    onPet = {
+                        if (running) stopService(Intent(this, PetOverlayService::class.java))
+                        else if (Settings.canDrawOverlays(this)) startForegroundService(Intent(this, PetOverlayService::class.java))
+                    },
+                    onPermission = { startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))) },
+                    onNote = { startActivity(Intent(this, QuickNoteActivity::class.java)) },
+                    onToggle = notes::toggle, onClear = notes::clearDone, onRetry = notes::retry,
+                )
+            }
         }
-        showButton.setOnClickListener {
-            startForegroundService(Intent(this, PetOverlayService::class.java))
-        }
-        findViewById<Button>(R.id.hide_pet).setOnClickListener {
-            stopService(Intent(this, PetOverlayService::class.java))
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
-        ) {
+        if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
         }
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        destination = intent.getStringExtra(EXTRA_SCREEN) ?: "home"
+        navigationRequest++
+    }
+
     override fun onResume() {
         super.onResume()
-        val canOverlay = Settings.canDrawOverlays(this)
-        status.setText(if (canOverlay) R.string.overlay_granted else R.string.overlay_needed)
-        grantButton.visibility = if (canOverlay) View.GONE else View.VISIBLE
-        showButton.isEnabled = canOverlay
+        permitted = Settings.canDrawOverlays(this)
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt("navigationRequest", navigationRequest)
+        super.onSaveInstanceState(outState)
+    }
+
+    companion object { const val EXTRA_SCREEN = "screen" }
 }

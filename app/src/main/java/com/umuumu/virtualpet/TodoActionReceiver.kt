@@ -4,16 +4,20 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 
-/** Handles checkbox and clear-done taps from the widget. Not exported, so only our PendingIntents reach it. */
 class TodoActionReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        val repository = TodoRepository.get(context)
-        when (intent.action) {
-            ACTION_TOGGLE -> repository.toggle(intent.getLongExtra(EXTRA_TODO_ID, -1))
-            ACTION_CLEAR_DONE -> repository.clearDone()
-            else -> return
-        }
-        VirtualPetAppWidgetProvider.refreshAll(context)
+        if (intent.action != ACTION_TOGGLE && intent.action != ACTION_CLEAR_DONE) return
+        val pending = goAsync()
+        Thread {
+            try {
+                val repository = TodoRepository.get(context)
+                when (intent.action) {
+                    ACTION_TOGGLE -> repository.toggle(intent.getLongExtra(EXTRA_TODO_ID, -1))
+                    ACTION_CLEAR_DONE -> repository.clearDone()
+                }
+                VirtualPetAppWidgetProvider.refreshAll(context)
+            } finally { pending.finish() }
+        }.start()
     }
 
     companion object {

@@ -4,12 +4,17 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 data class Todo(val id: Long, val text: String, val done: Boolean)
 
 /** Todo storage shared by the quick-note dialog and the home-screen widget. */
 class TodoRepository private constructor(context: Context) :
     SQLiteOpenHelper(context, "todos.db", null, 1) {
+    private val revision = MutableStateFlow(0L)
+    val changes = revision.asStateFlow()
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
@@ -42,7 +47,7 @@ class TodoRepository private constructor(context: Context) :
         }
 
     fun add(text: String) {
-        writableDatabase.insert(
+        writableDatabase.insertOrThrow(
             "todos",
             null,
             ContentValues().apply {
@@ -50,14 +55,17 @@ class TodoRepository private constructor(context: Context) :
                 put("created_at", System.currentTimeMillis())
             },
         )
+        revision.update { it + 1 }
     }
 
     fun toggle(id: Long) {
         writableDatabase.execSQL("UPDATE todos SET done = 1 - done WHERE id = ?", arrayOf(id))
+        revision.update { it + 1 }
     }
 
     fun clearDone() {
         writableDatabase.delete("todos", "done = 1", null)
+        revision.update { it + 1 }
     }
 
     companion object {

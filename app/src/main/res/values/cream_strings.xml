@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cream_home">陪伴</string>
+    <string name="cream_notes">記一筆</string>
+    <string name="cream_settings">設定</string>
+    <string name="cream_greeting">今天，也陪著你。</string>
+    <string name="cream_brand">桌寵日常 / LITTLE COMPANION</string>
+    <string name="cream_hero_title">小事，交給我記住。</string>
+    <string name="cream_hero_hint">點一下桌寵，隨時記下腦中的小事。</string>
+    <string name="cream_active">正在陪伴</string>
+    <string name="cream_resting">正在休息</string>
+    <string name="cream_quick_actions">隨手做一點</string>
+    <string name="cream_note_hint">先記下，就不怕忘記。</string>
+    <string name="cream_reply">嘴替</string>
+    <string name="cream_reply_hint">一起想想怎麼回。</string>
+    <string name="cream_widget_title">把小事放在桌面上</string>
+    <string name="cream_widget_hint">待辦小工具，想到就記、做完就勾。</string>
+    <string name="cream_settings_intro">讓陪伴剛剛好</string>
+    <string name="cream_companion">你的桌面小夥伴</string>
+    <string name="cream_permissions">桌寵與權限</string>
+    <string name="cream_show_pet">顯示桌寵</string>
+    <string name="cream_show_pet_hint">在其他應用程式上陪著你</string>
+    <string name="cream_overlay">浮動視窗權限</string>
+    <string name="cream_allowed">已允許</string>
+    <string name="cream_not_allowed">尚未允許</string>
+    <string name="cream_tools">工具</string>
+    <string name="cream_ai_settings">AI 設定</string>
+    <string name="cream_ai_hint">嘴替使用的金鑰與模型</string>
+    <string name="cream_widget">桌面小工具</string>
+    <string name="cream_widget_settings_hint">預覽待辦與加入桌面的方法</string>
+    <string name="cream_pet_tip">拖曳桌寵可以換個位置。
+點一下桌寵，就能使用隨手記功能。</string>
+    <string name="cream_notes_intro">把腦中的小事，輕輕放下</string>
+    <string name="cream_widget_pending">%1$d 件待辦</string>
+    <string name="cream_pending">%1$d 件小事，慢慢來就好。</string>
+    <string name="cream_empty_title">現在，腦袋輕一點。</string>
+    <string name="cream_empty_hint">想起什麼，就記在這裡。
+也能直接從桌寵或桌面小工具新增。</string>
+    <string name="cream_shared_notes">與桌面小工具共用同一份清單。</string>
+    <string name="cream_clear_title">清除已完成的小事？</string>
+    <string name="cream_clear_hint">未完成項目會保留。清除後，桌面小工具也會一起更新。</string>
+    <string name="cream_clear">清除</string>
+    <string name="cream_cancel">先不要</string>
+    <string name="cream_note_intro">不用整理好，先記下來就好。</string>
+    <string name="cream_saving">記下中…</string>
+    <string name="cream_save_failed">暫時無法儲存，內容仍保留。請再試一次。</string>
+    <string name="cream_load_failed">無法更新清單，請再試一次。</string>
+    <string name="cream_retry">再試一次</string>
+    <string name="cream_back">返回</string>
+    <string name="cream_widget_guide">長按桌面空白處 → 小工具 → 桌面寵物 → 待辦清單。
+
+長按小工具可以調整大小。每一列都能直接勾選，按 ＋ 就能記一筆。</string>
+    <string name="cream_widget_preview">小工具預覽</string>
+    <string name="cream_permission_title">給我一個小小的位置。</string>
+    <string name="cream_permission_intro">允許顯示在其他應用程式上層，就能隨時叫出桌寵、記下一件小事。</string>
+    <string name="cream_done">已完成</string>
+    <string name="cream_not_done">未完成</string>
+    <string name="cream_version">桌面寵物 · %1$s</string>
+    <string name="cream_ai_save_failed">設定未能完整儲存，請再試一次。</string>
+    <string name="cream_widget_empty">沒有待辦，真輕鬆。
+想到什麼，按 ＋ 記一筆。</string>
+</resources>

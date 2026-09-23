@@ -29,6 +29,7 @@ private class TodoViewsFactory(private val context: Context) : RemoteViewsServic
     override fun getViewAt(position: Int): RemoteViews {
         val todo = todos[position]
         return RemoteViews(context.packageName, R.layout.widget_todo_item).apply {
+            setContentDescription(R.id.todo_item, todo.text + "，" + context.getString(if (todo.done) R.string.cream_done else R.string.cream_not_done))
             if (todo.done) {
                 val text = SpannableString(todo.text).apply {
                     setSpan(StrikethroughSpan(), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
