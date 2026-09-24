@@ -13,7 +13,7 @@
 <img src="https://img.shields.io/badge/version-0.2.0-0080ff?style=flat" alt="version">
 <img src="https://img.shields.io/badge/minSdk-28-0080ff?style=flat&logo=android&logoColor=white" alt="minSdk">
 <img src="https://img.shields.io/badge/targetSdk-35-0080ff?style=flat&logo=android&logoColor=white" alt="targetSdk">
-<img src="https://img.shields.io/badge/license-unspecified-lightgrey?style=flat" alt="license">
+<img src="https://img.shields.io/badge/license-MIT-green?style=flat" alt="license">
 
 <em>Built with the tools and technologies:</em>
 
@@ -365,7 +365,7 @@ Without these properties `assembleRelease` still builds, but the APK is unsigned
 
 ## License
 
-No open-source license has been chosen for this project yet. Until a LICENSE file is added, all rights are reserved by the copyright holder.
+This project is released under the [MIT License](LICENSE).
 
 <div align="left"><a href="#top">Back to top</a></div>
 

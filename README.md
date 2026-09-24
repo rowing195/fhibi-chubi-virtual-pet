@@ -13,7 +13,7 @@
 <img src="https://img.shields.io/badge/version-0.2.0-0080ff?style=flat" alt="version">
 <img src="https://img.shields.io/badge/minSdk-28-0080ff?style=flat&logo=android&logoColor=white" alt="minSdk">
 <img src="https://img.shields.io/badge/targetSdk-35-0080ff?style=flat&logo=android&logoColor=white" alt="targetSdk">
-<img src="https://img.shields.io/badge/license-未指定-lightgrey?style=flat" alt="license">
+<img src="https://img.shields.io/badge/license-MIT-green?style=flat" alt="license">
 
 <em>使用的工具與技術：</em>
 
@@ -362,7 +362,7 @@ PUBLIC_PET_RELEASE_KEY_PASSWORD=...
 
 ## 授權
 
-本專案目前**尚未指定開源授權**。在加入 LICENSE 檔案之前，著作權人保留所有權利。
+本專案採用 [MIT 授權](LICENSE) 釋出。
 
 <div align="left"><a href="#top">回到頂端</a></div>
 
