@@ -3,22 +3,26 @@
     android:id="@+id/todo_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/widget_card_background"
     android:gravity="center_vertical"
-    android:minHeight="56dp"
-    android:orientation="horizontal">
+    android:minHeight="40dp"
+    android:orientation="horizontal"
+    android:paddingHorizontal="11dp">
 
     <ImageView
         android:id="@+id/todo_check"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:importantForAccessibility="no" />
 
     <TextView
         android:id="@+id/todo_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="9dp"
         android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="2"
         android:paddingVertical="6dp"
-        android:textSize="15sp" />
+        android:textSize="14sp" />
 </LinearLayout>

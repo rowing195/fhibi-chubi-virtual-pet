@@ -32,7 +32,7 @@
     <string name="cream_pet_tip">拖曳桌寵可以換個位置。
 點一下桌寵，就能選動作或使用隨手記。</string>
     <string name="cream_notes_intro">把腦中的小事，輕輕放下</string>
-    <string name="cream_widget_pending">%1$d 件待辦</string>
+    <string name="cream_widget_total">%1$d 件</string>
     <string name="cream_pending">%1$d 件小事，慢慢來就好。</string>
     <string name="cream_empty_title">現在，腦袋輕一點。</string>
     <string name="cream_empty_hint">想起什麼，就記在這裡。

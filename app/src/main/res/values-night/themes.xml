@@ -12,5 +12,7 @@
     <color name="widget_text_done">#FFC0BAA8</color>
     <color name="widget_accent">#FFC0D09D</color>
     <color name="widget_subtle">#FF343329</color>
+    <color name="widget_card">#FF3D3F35</color>
+    <color name="widget_chip">#FF3F4834</color>
     <color name="pet_page">#FF252720</color>
 </resources>

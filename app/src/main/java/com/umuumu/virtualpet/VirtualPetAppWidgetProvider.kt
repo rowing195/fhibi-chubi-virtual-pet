@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.view.View
 import android.widget.RemoteViews
 
 /** Home-screen todo list; taps are handled by [TodoActionReceiver]. */
@@ -50,8 +51,8 @@ class VirtualPetAppWidgetProvider : AppWidgetProvider() {
 
         return RemoteViews(context.packageName, R.layout.widget_todo).apply {
             val todos = TodoRepository.get(context).all()
-            setTextViewText(R.id.widget_count, context.getString(R.string.cream_widget_pending, todos.count { !it.done }))
-            setBoolean(R.id.todo_clear_done, "setEnabled", todos.any { it.done })
+            setTextViewText(R.id.widget_count, context.getString(R.string.cream_widget_total, todos.size))
+            setViewVisibility(R.id.todo_clear_done, if (todos.any { it.done }) View.VISIBLE else View.GONE)
             setRemoteAdapter(R.id.todo_list, Intent(context, TodoWidgetService::class.java))
             setEmptyView(R.id.todo_list, R.id.todo_empty)
             setPendingIntentTemplate(R.id.todo_list, toggleTemplate)

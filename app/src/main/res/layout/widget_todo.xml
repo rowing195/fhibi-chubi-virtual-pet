@@ -3,17 +3,18 @@
     android:id="@android:id/background"
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:background="@drawable/widget_background" android:orientation="vertical"
-    android:padding="12dp">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/cream_notes" android:textColor="@color/widget_text" android:textSize="17sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
-            <TextView android:id="@+id/widget_count" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/widget_text_done" android:textSize="12sp" android:maxLines="1" android:ellipsize="end" />
+    android:paddingHorizontal="12dp" android:paddingTop="12dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="44dp" android:gravity="center_vertical">
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center_vertical">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/cream_notes" android:textColor="@color/widget_text" android:textSize="16sp" android:textStyle="bold" android:maxLines="1" />
+        <TextView android:id="@+id/widget_count" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="7dp" android:background="@drawable/widget_chip_background" android:paddingHorizontal="7dp" android:paddingVertical="1dp" android:textColor="@color/widget_accent" android:textSize="11sp" android:textStyle="bold" android:maxLines="1" />
         </LinearLayout>
-        <ImageView android:id="@+id/todo_add" android:layout_width="48dp" android:layout_height="48dp" android:contentDescription="@string/widget_add" android:padding="12dp" android:background="@drawable/widget_action_background" android:src="@drawable/ic_add" />
+        <ImageView android:id="@+id/todo_clear_done" android:layout_width="44dp" android:layout_height="44dp" android:contentDescription="@string/widget_clear_done" android:padding="11dp" android:src="@drawable/ic_clear_done" />
+        <ImageView android:id="@+id/todo_add" android:layout_width="44dp" android:layout_height="44dp" android:contentDescription="@string/widget_add" android:padding="11dp" android:background="@drawable/widget_action_background" android:src="@drawable/ic_add" />
     </LinearLayout>
-    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
-        <ListView android:id="@+id/todo_list" android:layout_width="match_parent" android:layout_height="match_parent" android:divider="@null" />
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:layout_marginTop="6dp">
+        <!-- Cards are separated by gaps, and the list runs to the widget's bottom edge so a cut-off card shows there is more. -->
+        <ListView android:id="@+id/todo_list" android:layout_width="match_parent" android:layout_height="match_parent" android:divider="@android:color/transparent" android:dividerHeight="5dp" android:paddingBottom="12dp" android:clipToPadding="false" android:requiresFadingEdge="vertical" android:fadingEdgeLength="20dp" android:scrollbars="none" />
         <TextView android:id="@+id/todo_empty" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:text="@string/cream_widget_empty" android:textColor="@color/widget_text_done" android:textSize="14sp" />
     </FrameLayout>
-    <TextView android:id="@+id/todo_clear_done" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:gravity="center_vertical|end" android:text="@string/widget_clear_done" android:textSize="13sp" android:textColor="@color/widget_accent" android:paddingHorizontal="4dp" />
 </LinearLayout>

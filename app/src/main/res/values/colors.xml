@@ -5,5 +5,7 @@
     <color name="widget_text_done">#FF6D6558</color>
     <color name="widget_accent">#FF536344</color>
     <color name="widget_subtle">#FFEEE9DC</color>
+    <color name="widget_card">#FFF4EFE3</color>
+    <color name="widget_chip">#FFE7ECDD</color>
     <color name="pet_page">#FFF8F5ED</color>
 </resources>
