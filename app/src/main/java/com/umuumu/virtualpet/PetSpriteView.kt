@@ -37,6 +37,7 @@ enum class PetAnimation(val frames: List<Cell>, val frameMs: Long = 120L) {
     IDLE(IDLE_FRAMES, frameMs = 200L),
     RUN_RIGHT(cells(1, 8)),
     RUN_LEFT(cells(2, 8)),
+    RUN_BOTH(cells(2, 8) + cells(1, 8)),
     WAVE(cells(3, 4)),
     JUMP(cells(4, 5)),
     FAILED(cells(5, 8), frameMs = 150L),

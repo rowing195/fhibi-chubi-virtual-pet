@@ -1,6 +1,8 @@
 package com.umuumu.virtualpet
 
 import androidx.core.content.ContextCompat
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Notification
@@ -14,6 +16,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.graphics.PixelFormat
+import android.graphics.Rect
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.IBinder
@@ -34,6 +37,9 @@ class PetOverlayService : Service() {
     private lateinit var petView: PetSpriteView
     private lateinit var params: WindowManager.LayoutParams
     private var snapAnimator: ValueAnimator? = null
+    private var menuView: PetMenuView? = null
+    private var menuOpen = false
+    private var positionBeforeMenu = Rect()
     private var noteOpen = false
 
     private val noteStateReceiver = object : BroadcastReceiver() {
@@ -72,7 +78,7 @@ class PetOverlayService : Service() {
             height * PetSpriteView.CELL_WIDTH / PetSpriteView.CELL_HEIGHT,
             height,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
             PixelFormat.TRANSLUCENT,
         ).apply {
             gravity = Gravity.TOP or Gravity.START
@@ -81,9 +87,7 @@ class PetOverlayService : Service() {
         }
 
         petView = PetSpriteView(this)
-        petView.setOnClickListener {
-            startActivity(Intent(this, QuickNoteActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-        }
+        petView.setOnClickListener { openMenu() }
         petView.setOnTouchListener(DragListener())
         windowManager.addView(petView, params)
         petView.play(PetAnimation.WAVE) { rest() }
@@ -102,6 +106,7 @@ class PetOverlayService : Service() {
         runningState.value = false
         unregisterReceiver(noteStateReceiver)
         snapAnimator?.cancel()
+        menuView?.let(windowManager::removeView)
         windowManager.removeView(petView)
         super.onDestroy()
     }
@@ -164,11 +169,96 @@ class PetOverlayService : Service() {
         val screenWidth = resources.displayMetrics.widthPixels
         val targetX = if (params.x + params.width / 2 < screenWidth / 2) 0 else screenWidth - params.width
         petView.play(PetAnimation.JUMP) { rest() }
-        snapAnimator = ValueAnimator.ofInt(params.x, targetX).apply {
-            duration = SNAP_MS
+        glideTo(targetX, params.y) {}
+    }
+
+    private fun glideTo(x: Int, y: Int, durationMs: Long = SNAP_MS, onArrived: () -> Unit) {
+        snapAnimator?.cancel()
+        val fromX = params.x
+        val fromY = params.y
+        snapAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = durationMs
             interpolator = DecelerateInterpolator()
-            addUpdateListener { moveTo(it.animatedValue as Int, params.y) }
+            addUpdateListener {
+                val t = it.animatedValue as Float
+                moveTo(fromX + ((x - fromX) * t).toInt(), fromY + ((y - fromY) * t).toInt())
+            }
+            addListener(object : AnimatorListenerAdapter() {
+                private var cancelled = false
+
+                override fun onAnimationCancel(animation: Animator) {
+                    cancelled = true
+                }
+
+                override fun onAnimationEnd(animation: Animator) {
+                    if (!cancelled) onArrived()
+                }
+            })
             start()
+        }
+    }
+
+    private fun openMenu() {
+        if (menuOpen) return
+        menuOpen = true
+        positionBeforeMenu = Rect(params.x, params.y, params.x + params.width, params.y + params.height)
+        val metrics = resources.displayMetrics
+        val centerX = (metrics.widthPixels - params.width) / 2
+        petView.play(if (centerX > params.x) PetAnimation.RUN_RIGHT else PetAnimation.RUN_LEFT)
+        glideTo(centerX, (metrics.heightPixels - params.height) / 2, MENU_RUN_MS) {
+            val bounds = Rect(params.x, params.y, params.x + params.width, params.y + params.height)
+            val menu = PetMenuView(this, bounds, ::onMenuSelected)
+            windowManager.addView(menu, WindowManager.LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                PixelFormat.TRANSLUCENT,
+            ))
+            menuView = menu
+            petView.play(PetAnimation.WAVE) { rest() }
+        }
+    }
+
+    private fun closeMenu() {
+        menuView?.let(windowManager::removeView)
+        menuView = null
+        petView.play(PetAnimation.JUMP) { rest() }
+        glideTo(positionBeforeMenu.left, positionBeforeMenu.top, MENU_GLIDE_MS) {
+            menuOpen = false
+        }
+    }
+
+    private fun onMenuSelected(item: PetMenuItem?) {
+        val menu = menuView
+        if (menu?.showingActions == true) {
+            when (item) {
+                null -> closeMenu()
+                PetMenuItem.BOTTOM -> {
+                    menu.showMain()
+                    rest()
+                }
+                else -> menu.actionAt(item)?.let { petView.play(it) { rest() } }
+            }
+            return
+        }
+        when (item) {
+            PetMenuItem.TOP_LEFT -> {
+                menu?.showActions(ACTION_SLOTS)
+                petView.play(PetAnimation.IDLE)
+            }
+            PetMenuItem.TOP -> {
+                closeMenu()
+                startActivity(Intent(this, MainActivity::class.java)
+                    .putExtra(MainActivity.EXTRA_SCREEN, "settings")
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+            }
+            PetMenuItem.TOP_RIGHT -> {
+                closeMenu()
+                startActivity(Intent(this, QuickNoteActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            }
+            PetMenuItem.BOTTOM -> stopSelf()
+            else -> closeMenu()
         }
     }
 
@@ -186,6 +276,7 @@ class PetOverlayService : Service() {
         override fun onTouch(view: View, event: MotionEvent): Boolean {
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
+                    if (menuOpen) return true
                     snapAnimator?.cancel()
                     downRawX = event.rawX
                     downRawY = event.rawY
@@ -222,6 +313,15 @@ class PetOverlayService : Service() {
     enum class NoteState { OPENED, SAVED, CANCELLED, CLOSED }
 
     companion object {
+        private val ACTION_SLOTS = mapOf(
+            PetMenuItem.TOP_LEFT to PetAction(R.string.menu_action_idle, PetAnimation.IDLE),
+            PetMenuItem.TOP to PetAction(R.string.menu_action_run_both, PetAnimation.RUN_BOTH),
+            PetMenuItem.TOP_RIGHT to PetAction(R.string.menu_action_wave, PetAnimation.WAVE),
+            PetMenuItem.LEFT to PetAction(R.string.menu_action_jump, PetAnimation.JUMP),
+            PetMenuItem.RIGHT to PetAction(R.string.menu_action_failed, PetAnimation.FAILED),
+            PetMenuItem.BOTTOM_LEFT to PetAction(R.string.menu_action_review, PetAnimation.REVIEW),
+            PetMenuItem.BOTTOM_RIGHT to PetAction(R.string.menu_action_writing, PetAnimation.WRITING),
+        )
         private val runningState = MutableStateFlow(false)
         val running = runningState.asStateFlow()
         const val ACTION_STOP = "com.umuumu.virtualpet.action.STOP_PET"
@@ -232,6 +332,8 @@ class PetOverlayService : Service() {
         private const val PET_HEIGHT_DP = 80
         private const val DIRECTION_SLOP_DP = 4
         private const val SNAP_MS = 250L
+        private const val MENU_RUN_MS = 350L
+        private const val MENU_GLIDE_MS = 500L
 
         /** Lets the pet react to the quick-note dialog; ignored when the pet isn't showing. */
         fun sendNoteState(context: Context, state: NoteState) {

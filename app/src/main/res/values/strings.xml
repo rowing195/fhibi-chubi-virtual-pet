@@ -19,4 +19,17 @@
     <string name="pet_hide">收起寵物</string>
     <string name="pet_channel_name">浮動寵物</string>
     <string name="pet_notification_title">寵物正在畫面上陪你</string>
+    <string name="menu_coming_soon">待開發</string>
+    <string name="menu_settings">設定</string>
+    <string name="menu_quick_note">記一筆</string>
+    <string name="menu_close">關閉</string>
+    <string name="menu_back">返回</string>
+    <string name="menu_pet_actions">摸摸桌寵</string>
+    <string name="menu_action_idle">待機</string>
+    <string name="menu_action_run_both">左右跑</string>
+    <string name="menu_action_wave">揮手</string>
+    <string name="menu_action_jump">跳躍</string>
+    <string name="menu_action_failed">失落</string>
+    <string name="menu_action_review">完成檢視</string>
+    <string name="menu_action_writing">寫筆記</string>
 </resources>

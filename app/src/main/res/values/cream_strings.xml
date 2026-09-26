@@ -6,7 +6,7 @@
     <string name="cream_greeting">今天，也陪著你。</string>
     <string name="cream_brand">桌寵日常 / LITTLE COMPANION</string>
     <string name="cream_hero_title">小事，交給我記住。</string>
-    <string name="cream_hero_hint">點一下桌寵，隨時記下腦中的小事。</string>
+    <string name="cream_hero_hint">點一下桌寵，選個動作或記下腦中的小事。</string>
     <string name="cream_active">正在陪伴</string>
     <string name="cream_resting">正在休息</string>
     <string name="cream_quick_actions">隨手做一點</string>
@@ -29,7 +29,7 @@
     <string name="cream_widget">桌面小工具</string>
     <string name="cream_widget_settings_hint">預覽待辦與加入桌面的方法</string>
     <string name="cream_pet_tip">拖曳桌寵可以換個位置。
-點一下桌寵，就能使用隨手記功能。</string>
+點一下桌寵，就能選動作或使用隨手記。</string>
     <string name="cream_notes_intro">把腦中的小事，輕輕放下</string>
     <string name="cream_widget_pending">%1$d 件待辦</string>
     <string name="cream_pending">%1$d 件小事，慢慢來就好。</string>
