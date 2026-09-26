@@ -17,7 +17,7 @@ import com.umuumu.virtualpet.R
 import com.umuumu.virtualpet.ui.PetArtwork
 
 @Composable
-fun SettingsScreen(running: Boolean, permitted: Boolean, version: String, onPet: () -> Unit, onPermission: () -> Unit, onWidget: () -> Unit, onAi: (() -> Unit)?) {
+fun SettingsScreen(running: Boolean, permitted: Boolean, version: String, onPet: () -> Unit, onPermission: () -> Unit, onWidget: () -> Unit, onMenu: () -> Unit, onAi: (() -> Unit)?) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Text(stringResource(R.string.cream_settings_intro), color = MaterialTheme.colorScheme.onSurfaceVariant)
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -39,6 +39,7 @@ fun SettingsScreen(running: Boolean, permitted: Boolean, version: String, onPet:
         }
         SettingLink(R.string.cream_overlay, if (permitted) R.string.cream_allowed else R.string.cream_not_allowed, onPermission)
         Text(stringResource(R.string.cream_tools), modifier = Modifier.semantics { heading() })
+        SettingLink(R.string.menu_editor_title, R.string.cream_menu_editor_hint, onMenu)
         if (onAi != null) SettingLink(R.string.cream_ai_settings, R.string.cream_ai_hint, onAi)
         SettingLink(R.string.cream_widget, R.string.cream_widget_settings_hint, onWidget)
         Text(stringResource(R.string.cream_pet_tip), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)

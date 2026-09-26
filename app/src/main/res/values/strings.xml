@@ -32,4 +32,26 @@
     <string name="menu_action_failed">失落</string>
     <string name="menu_action_review">完成檢視</string>
     <string name="menu_action_writing">寫筆記</string>
+    <string name="menu_app_missing">這個 App 已無法開啟</string>
+    <string name="menu_position_top_left">左上</string>
+    <string name="menu_position_top">上</string>
+    <string name="menu_position_top_right">右上</string>
+    <string name="menu_position_left">左</string>
+    <string name="menu_position_right">右</string>
+    <string name="menu_position_bottom_left">左下</string>
+    <string name="menu_position_bottom">下</string>
+    <string name="menu_position_bottom_right">右下</string>
+    <string name="menu_editor_title">自訂桌寵選單</string>
+    <string name="menu_editor_hint">點選要設定的格子，再從下方選功能。點其他格子只會切換選取位置，原有功能都會保留。</string>
+    <string name="menu_editor_selected">已選：%1$s</string>
+    <string name="menu_choose_feature">內建功能</string>
+    <string name="menu_other_apps">其他應用程式</string>
+    <string name="menu_app_needs_empty">先移除一個 App 捷徑，才能把這格改成其他應用程式。</string>
+    <string name="menu_empty_slot">空位</string>
+    <string name="menu_choose_app">選擇應用程式</string>
+    <string name="menu_remove_app">移除 App 捷徑</string>
+    <string name="menu_search_apps">搜尋應用程式</string>
+    <string name="menu_no_apps">沒有符合的應用程式</string>
+    <string name="menu_reset">恢復預設排列</string>
+    <string name="menu_reset_confirm">將所有位置恢復預設，並移除 App 捷徑？</string>
 </resources>

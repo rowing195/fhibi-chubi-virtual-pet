@@ -11,6 +11,8 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -23,6 +25,8 @@ import com.umuumu.virtualpet.screens.home.HomeScreen
 import com.umuumu.virtualpet.screens.notes.NotesScreen
 import com.umuumu.virtualpet.screens.notes.NotesState
 import com.umuumu.virtualpet.screens.settings.SettingsScreen
+import com.umuumu.virtualpet.screens.settings.PetMenuEditorScreen
+import com.umuumu.virtualpet.screens.settings.PetMenuEditorViewModel
 import com.umuumu.virtualpet.ui.PetArtwork
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,14 +53,14 @@ fun PetApp(destination: String, navigationRequest: Int, notes: NotesState, runni
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            if (route != "home") TopAppBar(
+            if (route != "home" && route != "menu-editor") TopAppBar(
                 title = { Text(stringResource(pages.find { it.first == route }?.second ?: R.string.cream_widget)) },
                 navigationIcon = { if (route == "widget") IconButton(onClick = { nav.popBackStack() }) { Icon(Icons.AutoMirrored.Default.ArrowBack, stringResource(R.string.cream_back)) } },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
             )
         },
         bottomBar = {
-            if (route != "widget") NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
+            if (route != "widget" && route != "menu-editor") NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
                 pages.forEach { (page, label) ->
                     NavigationBarItem(modifier = Modifier.testTag("nav-$page"), selected = route == page, onClick = { navigate(page) }, icon = { Icon(when (page) { "home" -> Icons.Default.Home; "notes" -> Icons.AutoMirrored.Default.List; else -> Icons.Default.Settings }, null) }, label = { Text(stringResource(label)) })
                 }
@@ -67,8 +71,13 @@ fun PetApp(destination: String, navigationRequest: Int, notes: NotesState, runni
             NavHost(nav, startDestination = "home", modifier = Modifier.widthIn(max = 600.dp).fillMaxSize()) {
                 composable("home") { HomeScreen(running, permitted, onPet, onPermission, onNote, { nav.navigate("widget") }, onReply) }
                 composable("notes") { NotesScreen(notes, onNote, onToggle, onClear, onRetry) }
-                composable("settings") { SettingsScreen(running, permitted, version, onPet, onPermission, { nav.navigate("widget") }, onAi) }
+                composable("settings") { SettingsScreen(running, permitted, version, onPet, onPermission, { nav.navigate("widget") }, { nav.navigate("menu-editor") }, onAi) }
                 composable("widget") { WidgetGuide(onNote) }
+                composable("menu-editor") {
+                    val model: PetMenuEditorViewModel = viewModel()
+                    val state by model.state.collectAsStateWithLifecycle()
+                    PetMenuEditorScreen(state, model::assignFeature, model::assignApp, model::removeApp, model::reset) { nav.popBackStack() }
+                }
             }
         }
     }

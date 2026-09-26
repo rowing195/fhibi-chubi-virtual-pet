@@ -10,7 +10,7 @@
 <em>A floating companion that remembers the little things</em>
 
 <!-- BADGES -->
-<img src="https://img.shields.io/badge/version-0.2.1-0080ff?style=flat" alt="version">
+<img src="https://img.shields.io/badge/version-0.2.2-0080ff?style=flat" alt="version">
 <img src="https://img.shields.io/badge/minSdk-28-0080ff?style=flat&logo=android&logoColor=white" alt="minSdk">
 <img src="https://img.shields.io/badge/targetSdk-35-0080ff?style=flat&logo=android&logoColor=white" alt="targetSdk">
 <img src="https://img.shields.io/badge/license-MIT-green?style=flat" alt="license">
@@ -47,7 +47,7 @@
 
 ## Overview
 
-Desktop Pet (桌面寵物) is an Android app. Fibi floats on top of your other apps, tapping it opens a quick note, and a home-screen widget keeps your to-do list in view. This is the **standalone public-prep edition**. It ships only the pet, quick notes and the widget, with no camera, network, AI or AirScroll integration.
+Desktop Pet (桌面寵物) is an Android app. Fibi floats on top of your other apps, tapping it opens a menu of pet actions and quick notes, and a home-screen widget keeps your to-do list in view. This is the **standalone public-prep edition**. It ships only the pet, quick notes and the widget, with no camera, network, AI or AirScroll integration.
 
 > [!NOTE]
 > The app's interface is in Traditional Chinese only.
@@ -57,7 +57,9 @@ Desktop Pet (桌面寵物) is an Android app. Fibi floats on top of your other a
 The project makes jotting down a thought take as little effort as possible. The core features include:
 
 - **🐾 Floating pet:** A draggable overlay that snaps to the nearest screen edge and runs in the direction you drag it.
-- **📝 Tap to note:** Tapping the pet opens a quick-note dialog. The pet writes along with you and reacts differently when you save or cancel.
+- **🐾 Pet actions:** Tap the pet's menu to play idle, run, wave, jump, failed, review or writing animations.
+- **🎛️ Custom pet menu:** Arrange built-in actions or shortcuts to other apps; tapping a slot only selects it, while the options below assign its action and show app icons.
+- **📝 Tap to note:** Choose **記一筆** (Quick note) from the pet's menu to open the note dialog. The pet writes along with you and reacts differently when you save or cancel.
 - **📋 Home-screen widget:** A resizable to-do list where you can add, check off and clear items without opening the app.
 - **🔄 Live sync:** The app, the quick-note dialog and the widget share one local SQLite database, so a change in any of them shows up everywhere at once.
 - **🎨 Cream journal UI:** A cream and olive palette that follows the system dark mode and supports large font scales.
@@ -74,7 +76,7 @@ The project makes jotting down a thought take as little effort as possible. The 
 | 📄 | **Documentation** | <ul><li>Design spec, design handoff and v0.2.0 release notes in `.ui-work/` (Traditional Chinese)</li></ul> |
 | 🔌 | **Integrations** | <ul><li>`SYSTEM_ALERT_WINDOW` overlay</li><li>`specialUse` foreground service with an ongoing notification (hide the pet from the notification)</li><li>`AppWidgetProvider` + `RemoteViewsService` home-screen widget</li></ul> |
 | 🧩 | **Modularity** | <ul><li>`screens/` split by screen: `home`, `notes`, `settings`</li><li>`ui/` holds the theme and pet artwork</li><li>`TodoRepository` singleton owns all to-do reads and writes</li></ul> |
-| 🧪 | **Testing** | <ul><li>4 instrumentation tests in `CreamInterfaceTest`</li><li>Covers draft retention, list/widget sync, real widget taps and `MainActivity` reuse</li></ul> |
+| 🧪 | **Testing** | <ul><li>7 instrumentation tests across `CreamInterfaceTest` and the pet menu editor</li><li>Covers draft retention, list/widget sync, real widget taps, `MainActivity` reuse and menu assignments</li></ul> |
 | ⚡️ | **Performance** | <ul><li>Database work on `Dispatchers.IO`</li><li>Receivers and widget updates use `goAsync()` with a background thread</li><li>Pet drawn frame by frame from a single sprite sheet</li></ul> |
 | 🛡️ | **Security** | <ul><li>No `INTERNET` permission</li><li>Internal components are `exported="false"`; broadcasts are scoped to the app's own package</li><li>Release keys read from Gradle properties, never committed</li></ul> |
 | 📦 | **Dependencies** | <ul><li>Compose BOM `2024.12.01`, Material 3</li><li>`activity-compose` 1.9.3, `lifecycle-*-compose` 2.8.7, `navigation-compose` 2.8.5</li><li>Android Gradle Plugin 8.7.3, Gradle 8.11.1</li></ul> |
@@ -146,7 +148,7 @@ The project makes jotting down a thought take as little effort as possible. The 
 			</thead>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='app/build.gradle.kts'>build.gradle.kts</a></b></td>
-					<td style='padding: 8px;'>Defines the application ID, SDK range (28–35), version 0.2.0 and the Compose dependencies. The release signing config is created only when the signing keys are supplied through Gradle properties, so no key material lives in the repo.</td>
+					<td style='padding: 8px;'>Defines the application ID, SDK range (28–35), version 0.2.2 and the Compose dependencies. The release signing config is created only when the signing keys are supplied through Gradle properties, so no key material lives in the repo.</td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='app/src/main/AndroidManifest.xml'>AndroidManifest.xml</a></b></td>
@@ -232,7 +234,7 @@ The project makes jotting down a thought take as little effort as possible. The 
 								</tr>
 								<tr style='border-bottom: 1px solid #eee;'>
 									<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/screens/settings/SettingsScreen.kt'>settings/SettingsScreen.kt</a></b></td>
-									<td style='padding: 8px;'>Settings tab with the pet switch, overlay permission status, a link to the widget guide and the app version.</td>
+									<td style='padding: 8px;'>Settings tab with the pet switch, overlay permission status, the custom pet menu, a link to the widget guide and the app version.</td>
 								</tr>
 							</table>
 						</blockquote>
@@ -321,9 +323,10 @@ Opening the project in Android Studio is the easiest route. It generates `local.
 1. Open Desktop Pet (桌面寵物) and tap **前往授權** (Grant permission) on the home screen to allow "Display over other apps".
 2. Back in the app, tap **叫出寵物** (Show pet) and Fibi appears on screen.
 3. **Drag** the pet to move it. When you let go it snaps to the nearest screen edge.
-4. **Tap** the pet to open a quick note, type something and tap **記下** (Save).
-5. Long-press an empty spot on your home screen → Widgets → add **待辦清單** (To-do list) to check off or add items right there.
-6. To hide the pet, tap **收起寵物** (Hide pet) in the app or use the same action in the notification.
+4. **Tap** the pet to open its menu. Choose **摸摸桌寵** (Pet actions) to play an animation, or **記一筆** (Quick note) to enter a note and tap **記下** (Save).
+5. Open **Settings → Custom pet menu**, select a slot, then choose a built-in action or **Other apps** below. Selecting another slot only changes the selection; assigning a built-in action swaps it with its current slot or moves it into an empty slot.
+6. Long-press an empty spot on your home screen → Widgets → add **待辦清單** (To-do list) to check off or add items right there.
+7. To hide the pet, tap **收起寵物** (Hide pet) in the app or use the same action in the notification.
 
 ### Testing
 

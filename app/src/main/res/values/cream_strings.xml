@@ -28,6 +28,7 @@
     <string name="cream_ai_hint">嘴替使用的金鑰與模型</string>
     <string name="cream_widget">桌面小工具</string>
     <string name="cream_widget_settings_hint">預覽待辦與加入桌面的方法</string>
+    <string name="cream_menu_editor_hint">排列內建功能，或加入其他 App 捷徑</string>
     <string name="cream_pet_tip">拖曳桌寵可以換個位置。
 點一下桌寵，就能選動作或使用隨手記。</string>
     <string name="cream_notes_intro">把腦中的小事，輕輕放下</string>

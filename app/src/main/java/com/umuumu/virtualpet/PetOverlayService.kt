@@ -11,6 +11,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -38,6 +39,7 @@ class PetOverlayService : Service() {
     private lateinit var params: WindowManager.LayoutParams
     private var snapAnimator: ValueAnimator? = null
     private var menuView: PetMenuView? = null
+    private var mainEntries: Map<PetMenuItem, MenuEntry> = PetMenuPreferences.DEFAULTS
     private var menuOpen = false
     private var positionBeforeMenu = Rect()
     private var noteOpen = false
@@ -207,7 +209,8 @@ class PetOverlayService : Service() {
         petView.play(if (centerX > params.x) PetAnimation.RUN_RIGHT else PetAnimation.RUN_LEFT)
         glideTo(centerX, (metrics.heightPixels - params.height) / 2, MENU_RUN_MS) {
             val bounds = Rect(params.x, params.y, params.x + params.width, params.y + params.height)
-            val menu = PetMenuView(this, bounds, ::onMenuSelected)
+            mainEntries = PetMenuPreferences(this).read()
+            val menu = PetMenuView(this, bounds, mainEntries, ::onMenuSelected)
             windowManager.addView(menu, WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.MATCH_PARENT,
@@ -242,22 +245,34 @@ class PetOverlayService : Service() {
             }
             return
         }
-        when (item) {
-            PetMenuItem.TOP_LEFT -> {
-                menu?.showActions(ACTION_SLOTS)
-                petView.play(PetAnimation.IDLE)
+        when (val entry = item?.let(mainEntries::get)) {
+            is MenuEntry.Feature -> when (entry.feature) {
+                MenuFeature.PET_ACTIONS -> {
+                    menu?.showActions(ACTION_SLOTS)
+                    petView.play(PetAnimation.IDLE)
+                }
+                MenuFeature.SETTINGS -> {
+                    closeMenu()
+                    startActivity(Intent(this, MainActivity::class.java)
+                        .putExtra(MainActivity.EXTRA_SCREEN, "settings")
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+                }
+                MenuFeature.QUICK_NOTE -> {
+                    closeMenu()
+                    startActivity(Intent(this, QuickNoteActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                }
+                MenuFeature.CLOSE -> stopSelf()
             }
-            PetMenuItem.TOP -> {
+            is MenuEntry.App -> {
                 closeMenu()
-                startActivity(Intent(this, MainActivity::class.java)
-                    .putExtra(MainActivity.EXTRA_SCREEN, "settings")
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+                try {
+                    startActivity(Intent.makeMainActivity(entry.component).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                } catch (_: ActivityNotFoundException) {
+                    android.widget.Toast.makeText(this, R.string.menu_app_missing, android.widget.Toast.LENGTH_SHORT).show()
+                } catch (_: SecurityException) {
+                    android.widget.Toast.makeText(this, R.string.menu_app_missing, android.widget.Toast.LENGTH_SHORT).show()
+                }
             }
-            PetMenuItem.TOP_RIGHT -> {
-                closeMenu()
-                startActivity(Intent(this, QuickNoteActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            }
-            PetMenuItem.BOTTOM -> stopSelf()
             else -> closeMenu()
         }
     }

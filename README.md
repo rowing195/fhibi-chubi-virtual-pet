@@ -10,7 +10,7 @@
 <em>浮在畫面上的小夥伴，替你記住小事</em>
 
 <!-- BADGES -->
-<img src="https://img.shields.io/badge/version-0.2.1-0080ff?style=flat" alt="version">
+<img src="https://img.shields.io/badge/version-0.2.2-0080ff?style=flat" alt="version">
 <img src="https://img.shields.io/badge/minSdk-28-0080ff?style=flat&logo=android&logoColor=white" alt="minSdk">
 <img src="https://img.shields.io/badge/targetSdk-35-0080ff?style=flat&logo=android&logoColor=white" alt="targetSdk">
 <img src="https://img.shields.io/badge/license-MIT-green?style=flat" alt="license">
@@ -55,6 +55,7 @@
 
 - **🐾 浮動桌寵：** 可拖曳的懸浮視窗，放開後自動吸附到螢幕邊緣，拖動時會朝移動方向跑。
 - **🐾 摸摸桌寵：** 點桌寵開啟環形選單，可播放待機、左右跑、揮手、跳躍、失落、完成檢視與寫筆記。
+- **🎛️ 自訂桌寵選單：** 可調整內建功能的位置，或指定其他 App 捷徑；點格子只切換選取，下方選項才變更功能，並顯示 App 圖示。
 - **📝 隨手記：** 從桌寵選單選「記一筆」開啟對話框，桌寵會跟著寫字，儲存或取消時各有不同的反應動畫。
 - **📋 桌面待辦小工具：** 可自由縮放的清單，直接在桌面上新增、勾選、清除已完成。
 - **🔄 資料即時同步：** App、記一筆與小工具共用同一個本機 SQLite 資料庫，任何一邊修改都會立刻反映。
@@ -72,7 +73,7 @@
 | 📄 | **文件** | <ul><li>`.ui-work/` 內有設計規格、設計交接與 v0.2.0 發布說明</li></ul> |
 | 🔌 | **系統整合** | <ul><li>`SYSTEM_ALERT_WINDOW` 懸浮視窗</li><li>`specialUse` 類型前景服務與常駐通知（可從通知收起桌寵）</li><li>`AppWidgetProvider` + `RemoteViewsService` 桌面小工具</li></ul> |
 | 🧩 | **模組化** | <ul><li>`screens/` 依畫面分包：`home`、`notes`、`settings`</li><li>`ui/` 放主題與角色圖</li><li>`TodoRepository` 單例集中所有待辦讀寫</li></ul> |
-| 🧪 | **測試** | <ul><li>`CreamInterfaceTest` 4 項 instrumentation 測試</li><li>涵蓋草稿保留、清單與小工具同步、真實小工具點擊、`MainActivity` 重用</li></ul> |
+| 🧪 | **測試** | <ul><li>7 項 instrumentation 測試，涵蓋 `CreamInterfaceTest` 與選單編輯器</li><li>涵蓋草稿保留、清單與小工具同步、真實小工具點擊、`MainActivity` 重用與選單功能配置</li></ul> |
 | ⚡️ | **效能** | <ul><li>資料庫操作走 `Dispatchers.IO`</li><li>廣播接收器與小工具更新用 `goAsync()` 在背景執行緒處理</li><li>桌寵以單張 sprite sheet 逐格繪製</li></ul> |
 | 🛡️ | **安全** | <ul><li>沒有 `INTERNET` 權限</li><li>內部元件 `exported="false"`，廣播限定本 App 套件</li><li>正式版金鑰從 Gradle properties 讀取，不進版控</li></ul> |
 | 📦 | **相依套件** | <ul><li>Compose BOM `2024.12.01`、Material 3</li><li>`activity-compose` 1.9.3、`lifecycle-*-compose` 2.8.7、`navigation-compose` 2.8.5</li><li>Android Gradle Plugin 8.7.3、Gradle 8.11.1</li></ul> |
@@ -144,7 +145,7 @@
 			</thead>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='app/build.gradle.kts'>build.gradle.kts</a></b></td>
-					<td style='padding: 8px;'>定義 App 的套件 ID、SDK 範圍（28–35）、版本 0.2.0 與 Compose 相依套件。正式版簽章設定只在 Gradle properties 提供金鑰時才會建立，金鑰本身不進版控。</td>
+					<td style='padding: 8px;'>定義 App 的套件 ID、SDK 範圍（28–35）、版本 0.2.2 與 Compose 相依套件。正式版簽章設定只在 Gradle properties 提供金鑰時才會建立，金鑰本身不進版控。</td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='app/src/main/AndroidManifest.xml'>AndroidManifest.xml</a></b></td>
@@ -230,7 +231,7 @@
 								</tr>
 								<tr style='border-bottom: 1px solid #eee;'>
 									<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/screens/settings/SettingsScreen.kt'>settings/SettingsScreen.kt</a></b></td>
-									<td style='padding: 8px;'>設定頁：顯示桌寵開關、懸浮視窗授權狀態、小工具說明入口與 App 版本。</td>
+									<td style='padding: 8px;'>設定頁：顯示桌寵開關、懸浮視窗授權狀態、自訂桌寵選單、小工具說明入口與 App 版本。</td>
 								</tr>
 							</table>
 						</blockquote>
@@ -320,8 +321,9 @@
 2. 回到 App 按 **叫出寵物**，Fibi 就會浮在畫面上。
 3. **拖曳**可以移動桌寵，放開後會自動貼到最近的螢幕邊緣。
 4. **點一下**桌寵開啟選單；選「摸摸桌寵」可播放動作，選「記一筆」可輸入內容後按「記下」。
-5. 在桌面長按空白處 → 小工具 → 找到「待辦清單」加入桌面，就能直接勾選或新增待辦。
-6. 想收起桌寵，可以在 App 裡按 **收起寵物**，或從通知列的「收起寵物」操作。
+5. 到 **設定 → 自訂桌寵選單**，點選要設定的格子，再從下方選內建功能或「其他應用程式」；點另一格只會切換選取，內建功能會交換位置或移到空位。
+6. 在桌面長按空白處 → 小工具 → 找到「待辦清單」加入桌面，就能直接勾選或新增待辦。
+7. 想收起桌寵，可以在 App 裡按 **收起寵物**，或從通知列的「收起寵物」操作。
 
 ### 測試
 
