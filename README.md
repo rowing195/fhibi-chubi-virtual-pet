@@ -10,7 +10,7 @@
 <em>浮在畫面上的小夥伴，替你記住小事</em>
 
 <!-- BADGES -->
-<img src="https://img.shields.io/badge/version-0.2.0-0080ff?style=flat" alt="version">
+<img src="https://img.shields.io/badge/version-0.2.1-0080ff?style=flat" alt="version">
 <img src="https://img.shields.io/badge/minSdk-28-0080ff?style=flat&logo=android&logoColor=white" alt="minSdk">
 <img src="https://img.shields.io/badge/targetSdk-35-0080ff?style=flat&logo=android&logoColor=white" alt="targetSdk">
 <img src="https://img.shields.io/badge/license-MIT-green?style=flat" alt="license">
