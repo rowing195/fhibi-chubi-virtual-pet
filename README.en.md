@@ -178,6 +178,14 @@ The project makes jotting down a thought take as little effort as possible. The 
 							<td style='padding: 8px;'>Custom view that draws the pet frame by frame from the sprite sheet. Defines the idle, run left/right, wave, jump, failed, writing and review animations; idle breathes slowly and blinks only every few seconds.</td>
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/PetMenuView.kt'>PetMenuView.kt</a></b></td>
+							<td style='padding: 8px;'>Full-screen menu shown when you tap the pet: eight speech bubbles on a 3×3 grid around the pet, each tail pointing at it. Bubbles show a built-in feature or an app's icon and name, and can switch to the 摸摸桌寵 (Pet actions) submenu. Tapping an empty slot keeps the menu open; tapping outside the bubbles closes it.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/PetMenuPreferences.kt'>PetMenuPreferences.kt</a></b></td>
+							<td style='padding: 8px;'>Defines the menu's built-in features (Pet actions, Settings, Quick note, Close) and what each slot can hold: a built-in feature, another app, or nothing. The eight-slot layout is stored in SharedPreferences; unreadable entries fall back to the default layout, and apps that can no longer be opened show a placeholder label.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/QuickNoteActivity.kt'>QuickNoteActivity.kt</a></b></td>
 							<td style='padding: 8px;'>Dialog-style quick-note screen through which the pet, the widget and the app add to-dos. Also serves as the widget's clear-completed confirmation and reports its open and close state to the pet.</td>
 						</tr>
@@ -236,6 +244,14 @@ The project makes jotting down a thought take as little effort as possible. The 
 									<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/screens/settings/SettingsScreen.kt'>settings/SettingsScreen.kt</a></b></td>
 									<td style='padding: 8px;'>Settings tab with the pet switch, overlay permission status, the custom pet menu, a link to the widget guide and the app version.</td>
 								</tr>
+								<tr style='border-bottom: 1px solid #eee;'>
+									<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/screens/settings/PetMenuEditorScreen.kt'>settings/PetMenuEditorScreen.kt</a></b></td>
+									<td style='padding: 8px;'>The custom pet menu screen, previewing the layout as a 3×3 grid with the pet in the middle. After selecting a slot you can assign a built-in feature, pick another app from a searchable list, or remove an app already there; the layout can also be reset to the default.</td>
+								</tr>
+								<tr style='border-bottom: 1px solid #eee;'>
+									<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/screens/settings/PetMenuEditorViewModel.kt'>settings/PetMenuEditorViewModel.kt</a></b></td>
+									<td style='padding: 8px;'>Reads and saves the menu layout and loads the phone's launchable apps in the background (excluding this app, sorted by name). Each built-in feature appears exactly once: assigning it to a new slot swaps it with its current slot, and an app placed over a built-in feature moves that feature into an empty slot, or is refused when none is free.</td>
+								</tr>
 							</table>
 						</blockquote>
 					</details>
@@ -276,6 +292,10 @@ The project makes jotting down a thought take as little effort as possible. The 
 							<td style='padding: 8px;'><b><a href='app/src/androidTest/java/com/umuumu/virtualpet/CreamInterfaceTest.kt'>CreamInterfaceTest.kt</a></b></td>
 							<td style='padding: 8px;'>On-device UI tests covering <code>MainActivity</code> reuse, a draft that survives recreation and saves exactly once, widget toggles syncing to the open list, and rendering and tapping the real widget.</td>
 						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='app/src/androidTest/java/com/umuumu/virtualpet/PetMenuEditorTest.kt'>PetMenuEditorTest.kt</a></b></td>
+							<td style='padding: 8px;'>Tests for the custom pet menu: selecting another slot only changes the selection and leaves the layout alone, assigning a built-in feature swaps it with its current slot, and placing an app over a built-in feature moves that feature into an empty slot. Each test restores the original layout afterwards.</td>
+						</tr>
 					</table>
 				</blockquote>
 			</details>
@@ -294,7 +314,7 @@ The project makes jotting down a thought take as little effort as possible. The 
 - **Android SDK:** compileSdk 35
 - **Device:** a phone or emulator running Android 9 (API 28) or later
 
-Opening the project in Android Studio is the easiest route. It generates `local.properties` pointing at your Android SDK.
+Opening the project in Android Studio is the easiest route. It generates `local.properties` pointing at your Android SDK. To build from the command line only, first set the `ANDROID_HOME` environment variable to your Android SDK path, or create `local.properties` in the project root containing `sdk.dir=<path to Android SDK>`; otherwise the build fails with `SDK location not found`.
 
 ### Installation
 

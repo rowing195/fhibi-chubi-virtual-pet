@@ -175,6 +175,14 @@
 							<td style='padding: 8px;'>從 sprite sheet 逐格繪製桌寵的自訂 View，定義待機、左右奔跑、揮手、跳躍、失敗、寫字、檢查等動畫。待機時慢慢呼吸、每隔幾秒才眨一次眼。</td>
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/PetMenuView.kt'>PetMenuView.kt</a></b></td>
+							<td style='padding: 8px;'>點桌寵後出現的全螢幕選單，在桌寵四周的 3×3 格畫出八個對話泡泡，尾巴都指向桌寵。泡泡顯示內建功能或 App 的圖示與名稱，也能切換成「摸摸桌寵」的動作子選單。點空格不會關閉選單，點泡泡以外的地方才會關閉。</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/PetMenuPreferences.kt'>PetMenuPreferences.kt</a></b></td>
+							<td style='padding: 8px;'>定義選單可用的內建功能（摸摸桌寵、設定、記一筆、關閉），以及每格可放的內容：內建功能、其他 App 或空格。八格配置存在 SharedPreferences，無法解析的設定會退回預設配置，已無法開啟的 App 會顯示提示文字。</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/QuickNoteActivity.kt'>QuickNoteActivity.kt</a></b></td>
 							<td style='padding: 8px;'>對話框樣式的記一筆畫面，桌寵、小工具與 App 都從這裡新增待辦。也兼任小工具「清除已完成」的確認框，並把開啟與關閉狀態通知桌寵。</td>
 						</tr>
@@ -233,6 +241,14 @@
 									<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/screens/settings/SettingsScreen.kt'>settings/SettingsScreen.kt</a></b></td>
 									<td style='padding: 8px;'>設定頁：顯示桌寵開關、懸浮視窗授權狀態、自訂桌寵選單、小工具說明入口與 App 版本。</td>
 								</tr>
+								<tr style='border-bottom: 1px solid #eee;'>
+									<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/screens/settings/PetMenuEditorScreen.kt'>settings/PetMenuEditorScreen.kt</a></b></td>
+									<td style='padding: 8px;'>「自訂桌寵選單」頁面，用 3×3 格預覽選單配置，中間是桌寵。選一格後可指定內建功能、從可搜尋的清單挑其他 App，或移除已放的 App，也能恢復預設排列。</td>
+								</tr>
+								<tr style='border-bottom: 1px solid #eee;'>
+									<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/screens/settings/PetMenuEditorViewModel.kt'>settings/PetMenuEditorViewModel.kt</a></b></td>
+									<td style='padding: 8px;'>讀寫選單配置，並在背景載入手機上可啟動的 App 清單（排除本 App、依名稱排序）。每個內建功能只會出現一次：指定到新格子時會和原本的格子交換；App 蓋掉內建功能時，該功能會移到空格，沒有空格就不能放。</td>
+								</tr>
 							</table>
 						</blockquote>
 					</details>
@@ -273,6 +289,10 @@
 							<td style='padding: 8px;'><b><a href='app/src/androidTest/java/com/umuumu/virtualpet/CreamInterfaceTest.kt'>CreamInterfaceTest.kt</a></b></td>
 							<td style='padding: 8px;'>在實機或模擬器上執行的介面測試，驗證 <code>MainActivity</code> 重用、草稿跨重建保留且只存一次、小工具勾選同步到開啟中的清單，以及真實小工具的點擊與顯示。</td>
 						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='app/src/androidTest/java/com/umuumu/virtualpet/PetMenuEditorTest.kt'>PetMenuEditorTest.kt</a></b></td>
+							<td style='padding: 8px;'>自訂桌寵選單的測試，驗證點另一格只會切換選取、不改配置；指定內建功能會和原本的格子交換；把 App 放到內建功能的格子時，該功能會移到空格。每個測試結束後都會還原原本的配置。</td>
+						</tr>
 					</table>
 				</blockquote>
 			</details>
@@ -291,7 +311,7 @@
 - **Android SDK：** compileSdk 35
 - **執行裝置：** Android 9（API 28）以上的手機或模擬器
 
-建議直接用 Android Studio 開啟專案，它會自動產生 `local.properties` 指向你的 Android SDK。
+建議直接用 Android Studio 開啟專案，它會自動產生 `local.properties` 指向你的 Android SDK。只用命令列建置的話，請先把環境變數 `ANDROID_HOME` 設為 Android SDK 的路徑，或在專案根目錄建立 `local.properties` 並寫入 `sdk.dir=<Android SDK 路徑>`，否則建置會出現 `SDK location not found`。
 
 ### 安裝
 
