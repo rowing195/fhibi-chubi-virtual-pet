@@ -10,7 +10,7 @@
 <em>A floating companion that remembers the little things</em>
 
 <!-- BADGES -->
-<img src="https://img.shields.io/badge/version-0.2.2-0080ff?style=flat" alt="version">
+<img src="https://img.shields.io/badge/version-0.2.3-0080ff?style=flat" alt="version">
 <img src="https://img.shields.io/badge/minSdk-28-0080ff?style=flat&logo=android&logoColor=white" alt="minSdk">
 <img src="https://img.shields.io/badge/targetSdk-35-0080ff?style=flat&logo=android&logoColor=white" alt="targetSdk">
 <img src="https://img.shields.io/badge/license-MIT-green?style=flat" alt="license">
@@ -76,7 +76,7 @@ The project makes jotting down a thought take as little effort as possible. The 
 | 📄 | **Documentation** | <ul><li>Design spec, design handoff and the release notes for each version in `.ui-work/` (Traditional Chinese)</li><li>`CLAUDE.md` records the development rules for Claude Code (split with the integrated edition, signing and the release process)</li></ul> |
 | 🔌 | **Integrations** | <ul><li>`SYSTEM_ALERT_WINDOW` overlay</li><li>`specialUse` foreground service with an ongoing notification (hide the pet from the notification)</li><li>`AppWidgetProvider` + `RemoteViewsService` home-screen widget</li></ul> |
 | 🧩 | **Modularity** | <ul><li>`screens/` split by screen: `home`, `notes`, `settings`</li><li>`ui/` holds the theme and pet artwork</li><li>`TodoRepository` singleton owns all to-do reads and writes</li></ul> |
-| 🧪 | **Testing** | <ul><li>7 instrumentation tests across `CreamInterfaceTest` and the pet menu editor</li><li>Covers draft retention, list/widget sync, real widget taps, `MainActivity` reuse and menu assignments</li></ul> |
+| 🧪 | **Testing** | <ul><li>8 instrumentation tests across `CreamInterfaceTest` and the pet menu editor</li><li>Covers draft retention, list/widget sync, real widget taps, `MainActivity` reuse, pages not jumping during navigation and menu assignments</li></ul> |
 | ⚡️ | **Performance** | <ul><li>Database work on `Dispatchers.IO`</li><li>Receivers and widget updates use `goAsync()` with a background thread</li><li>Pet drawn frame by frame from a single sprite sheet</li></ul> |
 | 🛡️ | **Security** | <ul><li>No `INTERNET` permission</li><li>Internal components are `exported="false"`; broadcasts are scoped to the app's own package</li><li>Release keys read from Gradle properties, never committed</li></ul> |
 | 📦 | **Dependencies** | <ul><li>Compose BOM `2024.12.01`, Material 3</li><li>`activity-compose` 1.9.3, `lifecycle-*-compose` 2.8.7, `navigation-compose` 2.8.5</li><li>Android Gradle Plugin 8.7.3, Gradle 8.11.1</li></ul> |
@@ -149,7 +149,7 @@ The project makes jotting down a thought take as little effort as possible. The 
 			</thead>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='app/build.gradle.kts'>build.gradle.kts</a></b></td>
-					<td style='padding: 8px;'>Defines the application ID, SDK range (28–35), version 0.2.2 and the Compose dependencies. The release signing config is created only when the signing keys are supplied through Gradle properties, so no key material lives in the repo.</td>
+					<td style='padding: 8px;'>Defines the application ID, SDK range (28–35), version 0.2.3 and the Compose dependencies. The release signing config is created only when the signing keys are supplied through Gradle properties, so no key material lives in the repo.</td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='app/src/main/AndroidManifest.xml'>AndroidManifest.xml</a></b></td>
@@ -196,11 +196,11 @@ The project makes jotting down a thought take as little effort as possible. The 
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/VirtualPetAppWidgetProvider.kt'>VirtualPetAppWidgetProvider.kt</a></b></td>
-							<td style='padding: 8px;'>Home-screen to-do widget that shows the pending count and wires up add, toggle and clear-completed actions. Exposes <code>refreshAll</code> so every placed widget updates after any data change.</td>
+							<td style='padding: 8px;'>Home-screen to-do widget that shows the total count next to its title and wires up add, toggle and clear-completed actions; the clear button only appears when something is done. Exposes <code>refreshAll</code> so every placed widget updates after any data change.</td>
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/TodoWidgetService.kt'>TodoWidgetService.kt</a></b></td>
-							<td style='padding: 8px;'>Supplies the widget's list rows. Completed items get a strikethrough and a checked icon, and each row carries a screen-reader description of its done state.</td>
+							<td style='padding: 8px;'>Supplies the widget's list rows, each drawn as a small card. Completed items get a strikethrough and a checked icon, and each row carries a screen-reader description of its done state.</td>
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/TodoActionReceiver.kt'>TodoActionReceiver.kt</a></b></td>

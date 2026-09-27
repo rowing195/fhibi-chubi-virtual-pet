@@ -10,7 +10,7 @@
 <em>浮在畫面上的小夥伴，替你記住小事</em>
 
 <!-- BADGES -->
-<img src="https://img.shields.io/badge/version-0.2.2-0080ff?style=flat" alt="version">
+<img src="https://img.shields.io/badge/version-0.2.3-0080ff?style=flat" alt="version">
 <img src="https://img.shields.io/badge/minSdk-28-0080ff?style=flat&logo=android&logoColor=white" alt="minSdk">
 <img src="https://img.shields.io/badge/targetSdk-35-0080ff?style=flat&logo=android&logoColor=white" alt="targetSdk">
 <img src="https://img.shields.io/badge/license-MIT-green?style=flat" alt="license">
@@ -73,7 +73,7 @@
 | 📄 | **文件** | <ul><li>`.ui-work/` 內有設計規格、設計交接與各版發布說明</li><li>`CLAUDE.md` 記錄給 Claude Code 的開發規則（與整合版的分工、簽章與發版流程）</li></ul> |
 | 🔌 | **系統整合** | <ul><li>`SYSTEM_ALERT_WINDOW` 懸浮視窗</li><li>`specialUse` 類型前景服務與常駐通知（可從通知收起桌寵）</li><li>`AppWidgetProvider` + `RemoteViewsService` 桌面小工具</li></ul> |
 | 🧩 | **模組化** | <ul><li>`screens/` 依畫面分包：`home`、`notes`、`settings`</li><li>`ui/` 放主題與角色圖</li><li>`TodoRepository` 單例集中所有待辦讀寫</li></ul> |
-| 🧪 | **測試** | <ul><li>7 項 instrumentation 測試，涵蓋 `CreamInterfaceTest` 與選單編輯器</li><li>涵蓋草稿保留、清單與小工具同步、真實小工具點擊、`MainActivity` 重用與選單功能配置</li></ul> |
+| 🧪 | **測試** | <ul><li>8 項 instrumentation 測試，涵蓋 `CreamInterfaceTest` 與選單編輯器</li><li>涵蓋草稿保留、清單與小工具同步、真實小工具點擊、`MainActivity` 重用、換頁時畫面不跳動與選單功能配置</li></ul> |
 | ⚡️ | **效能** | <ul><li>資料庫操作走 `Dispatchers.IO`</li><li>廣播接收器與小工具更新用 `goAsync()` 在背景執行緒處理</li><li>桌寵以單張 sprite sheet 逐格繪製</li></ul> |
 | 🛡️ | **安全** | <ul><li>沒有 `INTERNET` 權限</li><li>內部元件 `exported="false"`，廣播限定本 App 套件</li><li>正式版金鑰從 Gradle properties 讀取，不進版控</li></ul> |
 | 📦 | **相依套件** | <ul><li>Compose BOM `2024.12.01`、Material 3</li><li>`activity-compose` 1.9.3、`lifecycle-*-compose` 2.8.7、`navigation-compose` 2.8.5</li><li>Android Gradle Plugin 8.7.3、Gradle 8.11.1</li></ul> |
@@ -146,7 +146,7 @@
 			</thead>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='app/build.gradle.kts'>build.gradle.kts</a></b></td>
-					<td style='padding: 8px;'>定義 App 的套件 ID、SDK 範圍（28–35）、版本 0.2.2 與 Compose 相依套件。正式版簽章設定只在 Gradle properties 提供金鑰時才會建立，金鑰本身不進版控。</td>
+					<td style='padding: 8px;'>定義 App 的套件 ID、SDK 範圍（28–35）、版本 0.2.3 與 Compose 相依套件。正式版簽章設定只在 Gradle properties 提供金鑰時才會建立，金鑰本身不進版控。</td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='app/src/main/AndroidManifest.xml'>AndroidManifest.xml</a></b></td>
@@ -193,11 +193,11 @@
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/VirtualPetAppWidgetProvider.kt'>VirtualPetAppWidgetProvider.kt</a></b></td>
-							<td style='padding: 8px;'>桌面待辦小工具，顯示未完成數量並綁定新增、勾選、清除已完成三種操作。提供 <code>refreshAll</code> 讓任何資料變動後同步更新所有已放置的小工具。</td>
+							<td style='padding: 8px;'>桌面待辦小工具，標題旁顯示總件數，並綁定新增、勾選、清除已完成三種操作；清除按鈕只在有已完成項目時出現。提供 <code>refreshAll</code> 讓任何資料變動後同步更新所有已放置的小工具。</td>
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/TodoWidgetService.kt'>TodoWidgetService.kt</a></b></td>
-							<td style='padding: 8px;'>提供小工具清單的每一列，已完成項目加刪除線並換成勾選圖示，每列都有給螢幕閱讀器的完成狀態描述。</td>
+							<td style='padding: 8px;'>提供小工具清單的每一列，每筆待辦是一張小卡片，已完成項目加刪除線並換成勾選圖示，每列都有給螢幕閱讀器的完成狀態描述。</td>
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='app/src/main/java/com/umuumu/virtualpet/TodoActionReceiver.kt'>TodoActionReceiver.kt</a></b></td>
