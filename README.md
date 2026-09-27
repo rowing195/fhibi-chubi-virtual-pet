@@ -70,7 +70,7 @@
 | :--- | :--- | :--- |
 | ⚙️ | **架構** | <ul><li>單一 `app` 模組，套件 `com.umuumu.virtualpet`</li><li>Jetpack Compose UI + `AndroidViewModel` + `StateFlow`</li><li>Navigation Compose 三個主分頁：陪伴／記一筆／設定</li><li>`PetOverlayService` 前景服務負責懸浮桌寵</li></ul> |
 | 🔩 | **程式品質** | <ul><li>Kotlin 2.0.21、JVM 17</li><li>記一筆草稿透過 `SavedStateHandle` 跨畫面重建保留</li><li>空白內容不能存、存檔中防重複送出</li><li>無障礙：標題語意、`liveRegion` 錯誤提示、小工具列的內容描述</li></ul> |
-| 📄 | **文件** | <ul><li>`.ui-work/` 內有設計規格、設計交接與 v0.2.0 發布說明</li></ul> |
+| 📄 | **文件** | <ul><li>`.ui-work/` 內有設計規格、設計交接與各版發布說明</li><li>`CLAUDE.md` 記錄給 Claude Code 的開發規則（與整合版的分工、簽章與發版流程）</li></ul> |
 | 🔌 | **系統整合** | <ul><li>`SYSTEM_ALERT_WINDOW` 懸浮視窗</li><li>`specialUse` 類型前景服務與常駐通知（可從通知收起桌寵）</li><li>`AppWidgetProvider` + `RemoteViewsService` 桌面小工具</li></ul> |
 | 🧩 | **模組化** | <ul><li>`screens/` 依畫面分包：`home`、`notes`、`settings`</li><li>`ui/` 放主題與角色圖</li><li>`TodoRepository` 單例集中所有待辦讀寫</li></ul> |
 | 🧪 | **測試** | <ul><li>7 項 instrumentation 測試，涵蓋 `CreamInterfaceTest` 與選單編輯器</li><li>涵蓋草稿保留、清單與小工具同步、真實小工具點擊、`MainActivity` 重用與選單功能配置</li></ul> |
@@ -85,6 +85,7 @@
 ```sh
 └── fhibi-chubi-virtual-pet/
     ├── .ui-work/                  # 設計規格與發布說明
+    ├── CLAUDE.md                  # 給 Claude Code 的開發規則
     ├── app/
     │   ├── build.gradle.kts
     │   └── src/
@@ -377,6 +378,8 @@ PUBLIC_PET_RELEASE_KEY_PASSWORD=...
 ```
 
 沒有設定這些值時，`assembleRelease` 仍可建置，但產出的是未簽章的 APK。請勿把 keystore 或密碼提交到 repo。
+
+換電腦開發時，keystore 檔本身不在 repo 裡：請把它和上面四行設定一起複製到新電腦，並把 `PUBLIC_PET_RELEASE_STORE_FILE` 改成新的路徑。GitHub Release 上的 APK 都是用這把金鑰簽署的，換了金鑰建出來的版本無法覆蓋更新已安裝的舊版，所以請另外備份這把金鑰。
 
 > [!NOTE]
 > 本版與含 AirScroll 的整合版使用相同套件 ID、不同簽章，兩者不能互相覆蓋安裝，也不能同時安裝。

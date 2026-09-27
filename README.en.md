@@ -73,7 +73,7 @@ The project makes jotting down a thought take as little effort as possible. The 
 | :--- | :--- | :--- |
 | ⚙️ | **Architecture** | <ul><li>Single `app` module, package `com.umuumu.virtualpet`</li><li>Jetpack Compose UI + `AndroidViewModel` + `StateFlow`</li><li>Navigation Compose with three tabs: Companion / Notes / Settings</li><li>`PetOverlayService` foreground service hosts the floating pet</li></ul> |
 | 🔩 | **Code Quality** | <ul><li>Kotlin 2.0.21, JVM 17</li><li>Quick-note draft kept across recreation via `SavedStateHandle`</li><li>Blank notes blocked, duplicate saves prevented</li><li>Accessibility: heading semantics, `liveRegion` errors, content descriptions on widget rows</li></ul> |
-| 📄 | **Documentation** | <ul><li>Design spec, design handoff and v0.2.0 release notes in `.ui-work/` (Traditional Chinese)</li></ul> |
+| 📄 | **Documentation** | <ul><li>Design spec, design handoff and the release notes for each version in `.ui-work/` (Traditional Chinese)</li><li>`CLAUDE.md` records the development rules for Claude Code (split with the integrated edition, signing and the release process)</li></ul> |
 | 🔌 | **Integrations** | <ul><li>`SYSTEM_ALERT_WINDOW` overlay</li><li>`specialUse` foreground service with an ongoing notification (hide the pet from the notification)</li><li>`AppWidgetProvider` + `RemoteViewsService` home-screen widget</li></ul> |
 | 🧩 | **Modularity** | <ul><li>`screens/` split by screen: `home`, `notes`, `settings`</li><li>`ui/` holds the theme and pet artwork</li><li>`TodoRepository` singleton owns all to-do reads and writes</li></ul> |
 | 🧪 | **Testing** | <ul><li>7 instrumentation tests across `CreamInterfaceTest` and the pet menu editor</li><li>Covers draft retention, list/widget sync, real widget taps, `MainActivity` reuse and menu assignments</li></ul> |
@@ -88,6 +88,7 @@ The project makes jotting down a thought take as little effort as possible. The 
 ```sh
 └── fhibi-chubi-virtual-pet/
     ├── .ui-work/                  # design spec and release notes
+    ├── CLAUDE.md                  # development rules for Claude Code
     ├── app/
     │   ├── build.gradle.kts
     │   └── src/
@@ -380,6 +381,8 @@ Then run:
 ```
 
 Without these properties `assembleRelease` still builds, but the APK is unsigned. Never commit the keystore or passwords.
+
+When moving to another computer, note that the keystore file itself is not in the repo: copy it together with the four settings above and point `PUBLIC_PET_RELEASE_STORE_FILE` at its new location. Every APK on GitHub Releases is signed with this key, and a build signed with a different key cannot update an installed copy, so keep a backup of it.
 
 > [!NOTE]
 > This edition and the AirScroll-integrated edition share the same application ID but use different signing keys, so neither can be installed over the other, and they cannot be installed side by side.
