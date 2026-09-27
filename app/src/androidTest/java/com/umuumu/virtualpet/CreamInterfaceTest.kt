@@ -1,10 +1,12 @@
 package com.umuumu.virtualpet
 
+import android.Manifest
 import android.content.Intent
 import android.content.ComponentName
 import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.FrameLayout
 import android.widget.ListView
@@ -13,6 +15,7 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.rule.GrantPermissionRule
 import java.io.File
 import org.junit.Assert.*
 import org.junit.Rule
@@ -20,7 +23,26 @@ import org.junit.Test
 
 class CreamInterfaceTest {
     @get:Rule val compose = createEmptyComposeRule()
+    // MainActivity asks for notifications on a fresh install; the system dialog would cover it and hide its UI.
+    @get:Rule val notifications: GrantPermissionRule =
+        if (Build.VERSION.SDK_INT >= 33) GrantPermissionRule.grant(Manifest.permission.POST_NOTIFICATIONS) else GrantPermissionRule.grant()
     private val context get() = InstrumentationRegistry.getInstrumentation().targetContext
+
+    @Test fun widgetGuideOpensWithoutJumpingHomePage() {
+        ActivityScenario.launch<MainActivity>(Intent(context, MainActivity::class.java)).use {
+            val shortcut = compose.onNodeWithText("把小事放在桌面上")
+            compose.waitUntil(5_000) { compose.onAllNodesWithText("把小事放在桌面上").fetchSemanticsNodes().isNotEmpty() }
+            shortcut.performScrollTo()
+            val originalTop = shortcut.fetchSemanticsNode().boundsInRoot.top
+            compose.mainClock.autoAdvance = false
+            shortcut.performClick()
+            compose.mainClock.advanceTimeByFrame()
+            val leavingTop = shortcut.fetchSemanticsNode().boundsInRoot.top
+            assertTrue("Home page jumped ${leavingTop - originalTop}px during widget navigation", kotlin.math.abs(leavingTop - originalTop) < 8f)
+            compose.mainClock.autoAdvance = true
+            compose.onNodeWithText(context.getString(R.string.cream_widget_guide)).assertExists()
+        }
+    }
 
     @Test fun settingsIntentReusesMainActivity() {
         ActivityScenario.launch<MainActivity>(Intent(context, MainActivity::class.java)).use { scenario ->

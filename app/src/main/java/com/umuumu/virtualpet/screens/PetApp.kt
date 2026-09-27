@@ -50,36 +50,66 @@ fun PetApp(destination: String, navigationRequest: Int, notes: NotesState, runni
         }
     }
     val pages = listOf("home" to R.string.cream_home, "notes" to R.string.cream_notes, "settings" to R.string.cream_settings)
+    val tabs: @Composable () -> Unit = {
+        NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
+            pages.forEach { (page, label) ->
+                NavigationBarItem(modifier = Modifier.testTag("nav-$page"), selected = route == page, onClick = { navigate(page) }, icon = { Icon(when (page) { "home" -> Icons.Default.Home; "notes" -> Icons.AutoMirrored.Default.List; else -> Icons.Default.Settings }, null) }, label = { Text(stringResource(label)) })
+            }
+        }
+    }
+    // Each destination draws its own bars, so they fade in and out with it; switching the Scaffold's bars on navigate
+    // resized the outgoing page and made it jump by the title bar's height while it faded.
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            if (route != "home" && route != "menu-editor") TopAppBar(
-                title = { Text(stringResource(pages.find { it.first == route }?.second ?: R.string.cream_widget)) },
-                navigationIcon = { if (route == "widget") IconButton(onClick = { nav.popBackStack() }) { Icon(Icons.AutoMirrored.Default.ArrowBack, stringResource(R.string.cream_back)) } },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
-            )
-        },
-        bottomBar = {
-            if (route != "widget" && route != "menu-editor") NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
-                pages.forEach { (page, label) ->
-                    NavigationBarItem(modifier = Modifier.testTag("nav-$page"), selected = route == page, onClick = { navigate(page) }, icon = { Icon(when (page) { "home" -> Icons.Default.Home; "notes" -> Icons.AutoMirrored.Default.List; else -> Icons.Default.Settings }, null) }, label = { Text(stringResource(label)) })
+        contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+    ) { padding ->
+        NavHost(nav, startDestination = "home", modifier = Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding)) {
+            composable("home") {
+                Destination(bottomBar = tabs) { HomeScreen(running, permitted, onPet, onPermission, onNote, { nav.navigate("widget") }, onReply) }
+            }
+            composable("notes") {
+                Destination(title = R.string.cream_notes, bottomBar = tabs) { NotesScreen(notes, onNote, onToggle, onClear, onRetry) }
+            }
+            composable("settings") {
+                Destination(title = R.string.cream_settings, bottomBar = tabs) {
+                    SettingsScreen(running, permitted, version, onPet, onPermission, { nav.navigate("widget") }, { nav.navigate("menu-editor") }, onAi)
                 }
             }
-        },
-    ) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding), contentAlignment = Alignment.TopCenter) {
-            NavHost(nav, startDestination = "home", modifier = Modifier.widthIn(max = 600.dp).fillMaxSize()) {
-                composable("home") { HomeScreen(running, permitted, onPet, onPermission, onNote, { nav.navigate("widget") }, onReply) }
-                composable("notes") { NotesScreen(notes, onNote, onToggle, onClear, onRetry) }
-                composable("settings") { SettingsScreen(running, permitted, version, onPet, onPermission, { nav.navigate("widget") }, { nav.navigate("menu-editor") }, onAi) }
-                composable("widget") { WidgetGuide(onNote) }
-                composable("menu-editor") {
-                    val model: PetMenuEditorViewModel = viewModel()
-                    val state by model.state.collectAsStateWithLifecycle()
-                    PetMenuEditorScreen(state, model::assignFeature, model::assignApp, model::removeApp, model::reset) { nav.popBackStack() }
+            composable("widget") {
+                Destination(title = R.string.cream_widget, onBack = { nav.popBackStack() }) { WidgetGuide(onNote) }
+            }
+            composable("menu-editor") {
+                // The editor draws its own title bar and keeps clear of the navigation bar itself.
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+                    Box(Modifier.widthIn(max = 600.dp).fillMaxSize()) {
+                        val model: PetMenuEditorViewModel = viewModel()
+                        val state by model.state.collectAsStateWithLifecycle()
+                        PetMenuEditorScreen(state, model::assignFeature, model::assignApp, model::removeApp, model::reset) { nav.popBackStack() }
+                    }
                 }
             }
         }
+    }
+}
+
+/**
+ * One screen with its own optional title bar and bottom bar. Screens without a bottom bar keep their content above the
+ * system navigation bar here, since the Scaffold leaves the bottom inset to the tabs.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun Destination(title: Int? = null, onBack: (() -> Unit)? = null, bottomBar: (@Composable () -> Unit)? = null, content: @Composable () -> Unit) {
+    Column(
+        Modifier.fillMaxSize().then(if (bottomBar == null) Modifier.windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)) else Modifier),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        if (title != null) TopAppBar(
+            title = { Text(stringResource(title)) },
+            navigationIcon = { if (onBack != null) IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Default.ArrowBack, stringResource(R.string.cream_back)) } },
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
+        )
+        Box(Modifier.weight(1f).widthIn(max = 600.dp).fillMaxWidth()) { content() }
+        bottomBar?.invoke()
     }
 }
 
