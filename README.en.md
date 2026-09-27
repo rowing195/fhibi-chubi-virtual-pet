@@ -382,7 +382,7 @@ Then run:
 
 Without these properties `assembleRelease` still builds, but the APK is unsigned. Never commit the keystore or passwords.
 
-When moving to another computer, note that the keystore file itself is not in the repo: copy it together with the four settings above and point `PUBLIC_PET_RELEASE_STORE_FILE` at its new location. Every APK on GitHub Releases is signed with this key, and a build signed with a different key cannot update an installed copy, so keep a backup of it.
+When moving to another computer, note that the keystore file itself is not in the repo: copy it together with the four settings above and point `PUBLIC_PET_RELEASE_STORE_FILE` at its new location. Every APK on GitHub Releases is signed with this key, and a build signed with a different key cannot update an installed copy, so keep a backup of it. The keystore and the four settings are backed up in the "fhibi-chubi-virtual-pet 簽章金鑰" entry of the KeePassXC database; no other project uses this key.
 
 > [!NOTE]
 > This edition and the AirScroll-integrated edition share the same application ID but use different signing keys, so neither can be installed over the other, and they cannot be installed side by side.

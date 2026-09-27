@@ -379,7 +379,7 @@ PUBLIC_PET_RELEASE_KEY_PASSWORD=...
 
 沒有設定這些值時，`assembleRelease` 仍可建置，但產出的是未簽章的 APK。請勿把 keystore 或密碼提交到 repo。
 
-換電腦開發時，keystore 檔本身不在 repo 裡：請把它和上面四行設定一起複製到新電腦，並把 `PUBLIC_PET_RELEASE_STORE_FILE` 改成新的路徑。GitHub Release 上的 APK 都是用這把金鑰簽署的，換了金鑰建出來的版本無法覆蓋更新已安裝的舊版，所以請另外備份這把金鑰。
+換電腦開發時，keystore 檔本身不在 repo 裡：請把它和上面四行設定一起複製到新電腦，並把 `PUBLIC_PET_RELEASE_STORE_FILE` 改成新的路徑。GitHub Release 上的 APK 都是用這把金鑰簽署的，換了金鑰建出來的版本無法覆蓋更新已安裝的舊版，所以請另外備份這把金鑰。金鑰檔與四個設定值備份在 KeePassXC 資料庫的「fhibi-chubi-virtual-pet 簽章金鑰」項目；這把金鑰只有本專案使用。
 
 > [!NOTE]
 > 本版與含 AirScroll 的整合版使用相同套件 ID、不同簽章，兩者不能互相覆蓋安裝，也不能同時安裝。
